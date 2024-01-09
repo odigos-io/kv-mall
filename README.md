@@ -36,6 +36,8 @@ Before running the kv mall application, you need to deploy the infrastructure. T
 make deploy-infra
 ````
 
+**Make sure all the infrastructure is running before running the application.**
+
 ## Running locally
 
 To build the project and run it locally on a Kind cluster, run the following command:

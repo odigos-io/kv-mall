@@ -5,4 +5,5 @@ RUN go build -o /go/bin/analytics main.go
 
 FROM gcr.io/distroless/base-debian12
 COPY --from=builder /go/bin/analytics /
+USER 15000
 ENTRYPOINT ["/analytics"]

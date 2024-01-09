@@ -5,4 +5,5 @@ RUN mvn -f /home/app/pom.xml clean package
 
 FROM eclipse-temurin:17-jre-jammy
 COPY --from=build /home/app/target/*.jar /app/frontend.jar
+USER 15000
 CMD ["java","-jar", "/app/frontend.jar"]
