@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: membership
+  labels:
+    app: membership
+spec:
+  selector:
+    matchLabels:
+      app: membership
+  template:
+    metadata:
+      labels:
+        app: membership
+    spec:
+      containers:
+      - name: membership
+        image: dev/membership:dev
+        env:
+          - name: KAFKA_ADDRESS
+            value: kafka-service.kafka:9092
+        ports:
+        - containerPort: 8080
+  

@@ -1,0 +1,5 @@
+.idea/
+/inventory/.mvn/
+/frontend/.mvn/
+/infra/cosmos-secret.yaml
+/pricing/.mvn/
