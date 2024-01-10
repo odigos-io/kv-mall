@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: analytics
-        image: dev/analytics:dev
+        image: keyval/kv-mall-analytics:v0.2
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service:9092
