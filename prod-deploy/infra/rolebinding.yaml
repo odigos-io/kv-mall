@@ -5,7 +5,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: kv-mall-infra
-    namespace: kv-mall
+    namespace: kv-mall-infra
 roleRef:
   kind: ClusterRole
   name: kv-mall-infra

@@ -1,0 +1,21 @@
+apiVersion: odigos.io/v1alpha1
+kind: InstrumentationConfig
+metadata:
+  name: deployment-analytics
+  namespace: kv-mall
+spec:
+  config:
+    - instrumentationLibraries:
+        - instrumentationLibraryName: github.com/gocql/gocql
+          language: go
+        - instrumentationLibraryName: database/sql
+          language: go
+      optionKey: db.statement
+      optionValueBoolean: true
+      spanKind: client
+    - instrumentationLibraries:
+        - instrumentationLibraryName: net/http
+          language: go
+      optionKey: http.request.body
+      optionValueBoolean: true
+      spanKind: client
