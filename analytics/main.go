@@ -40,21 +40,32 @@ func main() {
 		log.Fatal("failed to setup postgresql: ", err)
 	}
 
-	cosmos, err := persisters.NewCosmos()
-	if err != nil {
-		log.Fatal("failed to connect to cosmos: ", err)
+	var mgr *pkg.Manager
+	if persisters.IsCosmosAvailable() {
+		cosmos, err := persisters.NewCosmos()
+		if err != nil {
+			log.Fatal("failed to connect to cosmos: ", err)
+		}
+
+		if err := cosmos.SetupDB(); err != nil {
+			log.Fatal("failed to setup cosmos: ", err)
+		}
+
+		mgr := pkg.NewManager().
+			WithPersisters(memcached, cassandra, pg, cosmos).
+			WithMessageQueue(kafka)
+
+		defer mgr.Close()
+		go mgr.Run()
+	} else {
+		log.Println("Cosmos not available, skipping")
+		mgr := pkg.NewManager().
+			WithPersisters(memcached, cassandra, pg).
+			WithMessageQueue(kafka)
+
+		defer mgr.Close()
+		go mgr.Run()
 	}
-
-	if err := cosmos.SetupDB(); err != nil {
-		log.Fatal("failed to setup cosmos: ", err)
-	}
-
-	mgr := pkg.NewManager().
-		WithPersisters(memcached, cassandra, pg, cosmos).
-		WithMessageQueue(kafka)
-
-	defer mgr.Close()
-	go mgr.Run()
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)

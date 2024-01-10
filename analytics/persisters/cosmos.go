@@ -18,6 +18,10 @@ type Cosmos struct {
 	containerClient *azcosmos.ContainerClient
 }
 
+func IsCosmosAvailable() bool {
+	return os.Getenv("COSMOS_KEY") != ""
+}
+
 func NewCosmos() (*Cosmos, error) {
 	host := getCosmosHost()
 	key, exists := os.LookupEnv("COSMOS_KEY")
