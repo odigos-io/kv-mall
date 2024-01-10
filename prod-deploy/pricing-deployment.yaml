@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: pricing
-        image: edenfed/kv-shop-pricing:v0.1
+        image: keyval/kv-mall-pricing:v0.2
         ports:
         - containerPort: 8080
   

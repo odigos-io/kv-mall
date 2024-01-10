@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cassandra
+  namespace: kv-mall
+spec:
+  selector:
+    matchLabels:
+      app: cassandra
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cassandra
+    spec:
+      serviceAccountName: kv-mall-infra
+      containers:
+      - name: cassandra
+        image: cassandra:4.0
+        ports:
+        - containerPort: 9042
+        env:
+        - name: CASSANDRA_CLUSTER_NAME
+          value: "kvmall"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra
+  namespace: kv-mall
+spec:
+    selector:
+        app: cassandra
+    ports:
+    - protocol: TCP
+      port: 9042
+      targetPort: 9042

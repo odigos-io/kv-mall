@@ -40,11 +40,11 @@ deploy:
 .PHONY: build-push-images-prod
 build-push-images-prod: generate-webapp
 	@echo "Building images..."
-	docker buildx build -t edenfed/kv-mall-frontend:v0.1 $(PROJECT_DIR)frontend -f $(PROJECT_DIR)frontend/Dockerfile --platform linux/amd64,linux/arm64 --push
-	docker buildx build -t edenfed/kv-mall-inventory:v0.1 $(PROJECT_DIR)inventory -f $(PROJECT_DIR)inventory/Dockerfile --platform linux/amd64,linux/arm64 --push
-	docker buildx build -t edenfed/kv-mall-pricing:v0.1 $(PROJECT_DIR)pricing -f $(PROJECT_DIR)pricing/Dockerfile --platform linux/amd64,linux/arm64 --push
-	docker buildx build -t edenfed/kv-mall-coupon:v0.1 $(PROJECT_DIR)coupon -f $(PROJECT_DIR)coupon/Dockerfile --platform linux/amd64,linux/arm64 --push
-	docker buildx build -t edenfed/kv-mall-membership:v0.1 $(PROJECT_DIR)membership -f $(PROJECT_DIR)membership/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-frontend:v0.1 $(PROJECT_DIR)frontend -f $(PROJECT_DIR)frontend/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-inventory:v0.1 $(PROJECT_DIR)inventory -f $(PROJECT_DIR)inventory/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-pricing:v0.1 $(PROJECT_DIR)pricing -f $(PROJECT_DIR)pricing/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-coupon:v0.1 $(PROJECT_DIR)coupon -f $(PROJECT_DIR)coupon/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-membership:v0.1 $(PROJECT_DIR)membership -f $(PROJECT_DIR)membership/Dockerfile --platform linux/amd64,linux/arm64 --push
 
 .PHONY: deploy-infra
 deploy-infra:
@@ -56,3 +56,13 @@ deploy-infra:
 restart:
 	@echo "Restarting pods..."
 	kubectl delete pods --all
+
+.PHONY: build-push-images-prod
+build-push-images-prod: generate-webapp
+	@echo "Building images..."
+	docker buildx build -t keyval/kv-mall-frontend:v0.2 $(PROJECT_DIR)frontend -f $(PROJECT_DIR)frontend/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-inventory:v0.2 $(PROJECT_DIR)inventory -f $(PROJECT_DIR)inventory/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-pricing:v0.2 $(PROJECT_DIR)pricing -f $(PROJECT_DIR)pricing/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-coupon:v0.2 $(PROJECT_DIR)coupon -f $(PROJECT_DIR)coupon/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-membership:v0.2 $(PROJECT_DIR)membership -f $(PROJECT_DIR)membership/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-analytics:v0.2 $(PROJECT_DIR)analytics -f $(PROJECT_DIR)analytics/Dockerfile --platform linux/amd64,linux/arm64 --push

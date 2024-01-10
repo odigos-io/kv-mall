@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: kv-mall
+  labels:
+    app: postgres
+spec:
+    selector:
+      matchLabels:
+        app: postgres
+    template:
+      metadata:
+        labels:
+          app: postgres
+      spec:
+        serviceAccountName: kv-mall-infra
+        containers:
+        - name: postgres
+          image: postgres:latest
+          env:
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            value: postgres
+          - name: POSTGRES_DB
+            value: postgres
+          ports:
+          - containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: kv-mall
+spec:
+    selector:
+        app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

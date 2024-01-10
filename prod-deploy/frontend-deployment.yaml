@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: edenfed/kv-shop-frontend:v0.1
+        image: keyval/kv-mall-frontend:v0.2
         env:
         - name: INVENTORY_SERVICE_HOST
           value: inventory:8080
