@@ -23,7 +23,7 @@ public class ProductController {
         this.couponService = couponService;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "*")
     @GetMapping("/products")
     public List<Product> getProducts() {
         CompletableFuture<List<Product>> productsFuture = CompletableFuture.supplyAsync(inventoryService::getInventory);
@@ -71,7 +71,7 @@ public class ProductController {
         });
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "*")
     @PostMapping("/buy")
     public void buyProduct(@RequestParam(name ="id") int id) {
         double price = pricObservable(id)
