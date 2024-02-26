@@ -3,4 +3,4 @@ COPY . /app
 WORKDIR /app
 RUN npm install
 USER 15000
-CMD ["node","--require","/app/instrumentation.js","app.js"]
+CMD ["node","app.js"]
