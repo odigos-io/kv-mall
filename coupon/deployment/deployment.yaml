@@ -4,7 +4,6 @@ metadata:
   name: coupon
   labels:
     app: coupon
-    odigos-instrumentation: disabled
 spec:
   selector:
     matchLabels:
