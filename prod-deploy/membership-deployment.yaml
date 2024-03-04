@@ -18,7 +18,7 @@ spec:
         image: keyval/kv-mall-membership:v0.2
         env:
           - name: KAFKA_ADDRESS
-            value: kafka-service.kv-mall-infra:9092
+            value: kafka-service.kafka:9092
         ports:
         - containerPort: 8080
   

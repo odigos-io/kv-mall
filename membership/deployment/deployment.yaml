@@ -16,6 +16,10 @@ spec:
       containers:
       - name: membership
         image: dev/membership:dev
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "250m"
         env:
           - name: KAFKA_ADDRESS
             value: kafka-service.kafka:9092

@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/segmentio/kafka-go"
 	"log/slog"
 	"net/http"
+	"runtime"
 	"strconv"
+
+	"github.com/segmentio/kafka-go"
 )
 
 const (
@@ -48,6 +50,8 @@ func main() {
 				},
 			},
 		})
+
+		runtime.GC()
 
 		if err != nil {
 			slog.Error("failed to write message to kafka", "error", err)

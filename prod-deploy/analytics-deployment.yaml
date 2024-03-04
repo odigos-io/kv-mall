@@ -18,13 +18,13 @@ spec:
         image: keyval/kv-mall-analytics:v0.2
         env:
         - name: KAFKA_ADDRESS
-          value: kafka-service.kv-mall-infra:9092
+          value: kafka-service.kafka:9092
         - name: MEMCACHED_ADDR
-          value: memcached.kv-mall-infra:11211
+          value: memcached.memcached:11211
         - name: CASSANDRA_ADDR
-          value: cassandra.kv-mall-infra:9042
+          value: cassandra.cassandra:9042
         - name: POSTGRESQL_ADDR
-          value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
+          value: postgresql://postgres:postgres@postgres.postgres:5432/postgres?sslmode=disable
         - name: COSMOS_KEY
           valueFrom:
             secretKeyRef:

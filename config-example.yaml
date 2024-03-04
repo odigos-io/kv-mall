@@ -13,9 +13,3 @@ spec:
       optionKey: db.statement
       optionValueBoolean: true
       spanKind: client
-    - instrumentationLibraries:
-        - instrumentationLibraryName: net/http
-          language: go
-      optionKey: http.request.body
-      optionValueBoolean: true
-      spanKind: client
