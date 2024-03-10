@@ -1,4 +1,9 @@
 Flask==2.0.1
 Werkzeug==2.0.1
-mysql-connector-python==8.0.23
+google-cloud-sqlcommenter==2.0.0
+mysql-connector-python==8.0.26
 requests==2.25.1
+sqlalchemy==2.0.28
+pymysql==1.1.0
+# without this sqlcommenter won't let us do with_opentelemetry=True
+opentelemetry-sdk==1.4.1
