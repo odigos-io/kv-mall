@@ -14,13 +14,15 @@ public class ProductController {
     private final InventoryService inventoryService;
     private final PricingService pricingService;
     private final CouponService couponService;
+    private final AdsService adsService;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     @Autowired
-    public ProductController(InventoryService inventoryService, PricingService pricingService, CouponService couponService) {
+    public ProductController(InventoryService inventoryService, PricingService pricingService, CouponService couponService, AdsService adsService) {
         this.inventoryService = inventoryService;
         this.pricingService = pricingService;
         this.couponService = couponService;
+        this.adsService = adsService;
     }
 
     @CrossOrigin(origins = "*")
@@ -58,6 +60,12 @@ public class ProductController {
 
         // Get coupons
         this.couponService.getCoupons();
+
+        // Get ads
+        List<Ad> ads = this.adsService.getads();
+        for (Ad ad : ads) {
+            System.out.println("Ad: " + ad.getTitle() + " - " + ad.getDescription());
+        }
 
         return products;
     }

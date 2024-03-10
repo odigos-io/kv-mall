@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: mysql
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: rootpassword
+            - name: MYSQL_DATABASE
+              value: adsdb
+            - name: MYSQL_USER
+              value: adsuser
+            - name: MYSQL_PASSWORD
+              value: adspass
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mysql-initdb
+          configMap:
+            name: mysql-initdb-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+  namespace: mysql
+data:
+  init-db.sql: |
+    CREATE DATABASE IF NOT EXISTS adsdb;
+    USE adsdb;
+    CREATE TABLE IF NOT EXISTS ads (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        price FLOAT NOT NULL,
+        posted_date DATE NOT NULL
+    );
+    INSERT INTO ads (title, description, price, posted_date) VALUES
+    ('Vintage Bicycle', 'A perfect condition vintage bicycle.', 150.00, '2023-01-01'),
+    ('Coffee Table', 'Modern coffee table in great condition.', 75.00, '2023-02-15'),
+    ('Gaming Console', 'Latest model, like new. Comes with two controllers.', 200.00, '2023-03-10'),
+    ('Leather Jacket', 'Genuine leather, barely worn.', 100.00, '2023-04-05');
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: mysql
+spec:
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  selector:
+    app: mysql

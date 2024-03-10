@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ads
+  labels:
+    app: ads
+spec:
+  selector:
+    matchLabels:
+      app: ads
+  template:
+    metadata:
+      labels:
+        app: ads
+    spec:
+      containers:
+        - name: ads
+          image: dev/ads:dev
+          ports:
+            - containerPort: 8080
+          securityContext:
+            runAsUser: 1000
