@@ -5,5 +5,3 @@ mysql-connector-python==8.0.26
 requests==2.25.1
 sqlalchemy==2.0.28
 pymysql==1.1.0
-# without this sqlcommenter won't let us do with_opentelemetry=True
-opentelemetry-sdk==1.4.1
