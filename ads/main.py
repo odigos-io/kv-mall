@@ -1,8 +1,9 @@
 import sqlalchemy
 from flask import Flask, jsonify, request
 import requests
+import signal
 import os
-import random
+import sys
 
 from sqlalchemy import create_engine, event
 from google.cloud.sqlcommenter.sqlalchemy.executor import BeforeExecuteFactory
@@ -19,6 +20,10 @@ except ImportError:
 app = Flask(__name__)
 engine = None
 
+def signal_handler(sig, frame):
+    print('Terminating inventory service')
+    sys.exit(0)
+
 def getads():
     with engine.begin() as conn:
         result = conn.execute(sqlalchemy.text('SELECT * FROM ads'))
@@ -33,6 +38,7 @@ def ads():
     return jsonify(getads())
 
 def main():
+    signal.signal(signal.SIGTERM, signal_handler)
     global engine
     PORT = int(os.getenv('PORT', '8080'))
     listener = None
