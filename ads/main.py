@@ -1,6 +1,5 @@
 import sqlalchemy
 from flask import Flask, jsonify, request
-import requests
 import signal
 import os
 import sys
@@ -31,7 +30,6 @@ def getads():
         app.logger.info("Ads retrieved from the database: {}".format(ads))
         return ads
 
-
 @app.route('/ads', methods=['GET'])
 def ads():
     app.logger.info('ads request received!')
@@ -50,7 +48,7 @@ def main():
     else:
         app.logger.info("Not using OpenTelemetry")
         listener = BeforeExecuteFactory()
-        
+  
     event.listen(engine, 'before_cursor_execute', listener, retval=True)
     app.run(host='0.0.0.0', port=PORT, debug=False)
 
