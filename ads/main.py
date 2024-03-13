@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 import signal
 import os
 import sys
+import time
 
 from sqlalchemy import create_engine, event
 from google.cloud.sqlcommenter.sqlalchemy.executor import BeforeExecuteFactory
@@ -24,23 +25,29 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 def getads():
-    with engine.begin() as conn:
-        # If OpenTelemetry exists, create new span
-        if propagator is not None:
-            import opentelemetry.trace as trace
-            tracer = trace.get_tracer(instrumenting_module_name="database/sql")
-            with tracer.start_as_current_span("SELECT * FROM ads'") as span:
-                span.set_attribute("db.type", "mysql")
-                span.set_attribute("db.instance", "adsdb")
-                span.set_attribute("db.statement", "SELECT * FROM ads'")
+    while True:
+        try:
+            with engine.begin() as conn:
+                # If OpenTelemetry exists, create new span
+                if propagator is not None:
+                    import opentelemetry.trace as trace
+                    tracer = trace.get_tracer(instrumenting_module_name="database/sql")
+                    with tracer.start_as_current_span("SELECT * FROM ads") as span:
+                        span.set_attribute("db.type", "mysql")
+                        span.set_attribute("db.instance", "adsdb")
+                        span.set_attribute("db.statement", "SELECT * FROM ads'")
+                        result = conn.execute(sqlalchemy.text('SELECT * FROM ads'))
+                        ads = [dict(row) for row in result.mappings().all()]
+                        app.logger.info("Ads retrieved from the database: {}".format(ads))
+                        return ads
                 result = conn.execute(sqlalchemy.text('SELECT * FROM ads'))
                 ads = [dict(row) for row in result.mappings().all()]
                 app.logger.info("Ads retrieved from the database: {}".format(ads))
                 return ads
-        result = conn.execute(sqlalchemy.text('SELECT * FROM ads'))
-        ads = [dict(row) for row in result.mappings().all()]
-        app.logger.info("Ads retrieved from the database: {}".format(ads))
-        return ads
+        except Exception as e:
+            app.logger.error("Error retrieving ads from the database: {}, retrying again soon".format(e))
+            time.sleep(1)
+            continue
 
 @app.route('/ads', methods=['GET'])
 def ads():
