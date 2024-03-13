@@ -25,6 +25,18 @@ def signal_handler(sig, frame):
 
 def getads():
     with engine.begin() as conn:
+        # If OpenTelemetry exists, create new span
+        if propagator is not None:
+            import opentelemetry.trace as trace
+            tracer = trace.get_tracer(instrumenting_module_name="database/sql")
+            with tracer.start_as_current_span("SELECT * FROM ads'") as span:
+                span.set_attribute("db.type", "mysql")
+                span.set_attribute("db.instance", "adsdb")
+                span.set_attribute("db.statement", "SELECT * FROM ads'")
+                result = conn.execute(sqlalchemy.text('SELECT * FROM ads'))
+                ads = [dict(row) for row in result.mappings().all()]
+                app.logger.info("Ads retrieved from the database: {}".format(ads))
+                return ads
         result = conn.execute(sqlalchemy.text('SELECT * FROM ads'))
         ads = [dict(row) for row in result.mappings().all()]
         app.logger.info("Ads retrieved from the database: {}".format(ads))

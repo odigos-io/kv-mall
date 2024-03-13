@@ -20,6 +20,6 @@ spec:
             - containerPort: 8080
           securityContext:
             runAsUser: 1000
-          # env:
-          # - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
-          #   value: sqlalchemy
+          env:
+          - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
+            value: sqlalchemy,pymysql
