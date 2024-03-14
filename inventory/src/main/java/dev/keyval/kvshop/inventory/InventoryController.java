@@ -30,7 +30,7 @@ public class InventoryController {
     @PostMapping("/buy")
     public void buyProduct(@RequestParam int id) throws InterruptedException {
         System.out.println("Buying product with id " + id);
-        ProducerRecord<String, String> record = new ProducerRecord<>("orders", "Product with id " + id + " has been bought");
+        ProducerRecord<String, String> record = new ProducerRecord<>("orders", "" + id, "Product with id " + id + " has been bought");
         record.headers().add("product-id", String.valueOf(id).getBytes());
         this.producer.send(record);
         this.producer.flush();
