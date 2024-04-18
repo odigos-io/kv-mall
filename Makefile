@@ -16,6 +16,7 @@ build-images: generate-webapp
 	docker build -t dev/coupon:dev $(PROJECT_DIR)coupon -f $(PROJECT_DIR)coupon/Dockerfile
 	docker build -t dev/membership:dev $(PROJECT_DIR)membership -f $(PROJECT_DIR)membership/Dockerfile
 	docker build -t dev/analytics:dev $(PROJECT_DIR)analytics -f $(PROJECT_DIR)analytics/Dockerfile
+	docker build -t dev/load-generator:dev $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile
 
 .PHONY: load-to-kind
 load-to-kind:
@@ -26,6 +27,7 @@ load-to-kind:
 	kind load docker-image dev/coupon:dev
 	kind load docker-image dev/membership:dev
 	kind load docker-image dev/analytics:dev
+	kind load docker-image dev/load-generator:dev
 
 .PHONY: deploy
 deploy:
@@ -36,6 +38,7 @@ deploy:
 	kubectl apply -f $(PROJECT_DIR)coupon/deployment/
 	kubectl apply -f $(PROJECT_DIR)membership/deployment/
 	kubectl apply -f $(PROJECT_DIR)analytics/deployment/
+	kubectl apply -f $(PROJECT_DIR)load-generator/deployment/
 
 .PHONY: build-push-images-prod
 build-push-images-prod: generate-webapp
@@ -66,3 +69,4 @@ build-push-images-prod: generate-webapp
 	docker buildx build -t keyval/kv-mall-coupon:v0.2 $(PROJECT_DIR)coupon -f $(PROJECT_DIR)coupon/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t keyval/kv-mall-membership:v0.2 $(PROJECT_DIR)membership -f $(PROJECT_DIR)membership/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t keyval/kv-mall-analytics:v0.2 $(PROJECT_DIR)analytics -f $(PROJECT_DIR)analytics/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-load-generator:v0.2 $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile --platform linux/amd64,linux/arm64 --push
