@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  labels:
+    app: load-generator
+spec:
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      labels:
+        app: load-generator
+    spec:
+      containers:
+      - name: load-generator
+        image: keyval/kv-mall-load-generator:v0.2
+        env:
+        - name: BUY_PRODUCT_INTERVAL
+          value: "2s"
+        - name: GET_PRODUCTS_INTERVAL
+          value: "10s"

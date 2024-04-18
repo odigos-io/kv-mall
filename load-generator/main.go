@@ -13,7 +13,7 @@ import (
 const (
 	FrontendURL = "http://frontend:8080"
 
-	DefaultBuyProductInterval = 1 * time.Second
+	DefaultBuyProductInterval = 2 * time.Second
 	BuyProductIntervalEnv = "BUY_PRODUCT_INTERVAL"
 
 	DefaultGetProductsInterval = 10 * time.Second
@@ -45,9 +45,15 @@ func (lg *LoadGenerator) applyEnvVars() {
 	}
 }
 
-func (lg *LoadGenerator) buyProduct(productID int) {
+func (lg *LoadGenerator) buyProduct(ctx context.Context, productID int) {
 	buyURL := fmt.Sprintf("%s/buy?id=%d", FrontendURL, productID)
-	resp, err := lg.httpClient.Post(buyURL, "application/json", nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", buyURL, nil)
+	if err != nil {
+		fmt.Printf("Error creating request for buying product %d: %v\n", productID, err)
+		return
+	}
+
+	resp, err :=lg.httpClient.Do(req)
 
 	if err != nil {
 		fmt.Printf("Error buying product %d: %v\n", productID, err)
@@ -59,9 +65,15 @@ func (lg *LoadGenerator) buyProduct(productID int) {
 	}
 }
 
-func (lg *LoadGenerator) getProducts() {
+func (lg *LoadGenerator) getProducts(ctx context.Context) {
 	getProductsURL := fmt.Sprintf("%s/products", FrontendURL)
-	resp, err := lg.httpClient.Get(getProductsURL)
+	req, err := http.NewRequestWithContext(ctx, "GET", getProductsURL, nil)
+	if err != nil {
+		fmt.Printf("Error creating request for getting products: %v\n", err)
+		return
+	}
+
+	resp, err := lg.httpClient.Do(req)
 
 	if err != nil {
 		fmt.Printf("Error getting products: %v\n", err)
@@ -85,13 +97,13 @@ func (lg *LoadGenerator) run(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-tickerBuyProduct.C:
-			lg.buyProduct(lg.lastProductID)
+			go lg.buyProduct(ctx, lg.lastProductID)
 			lg.lastProductID++
 			if lg.lastProductID > MaxProductID {
 				lg.lastProductID = MinProductID
 			}
 		case <-tickerGetProducts.C:
-			lg.getProducts()
+			go lg.getProducts(ctx)
 		}
 	}
 }

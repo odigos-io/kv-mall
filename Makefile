@@ -69,3 +69,4 @@ build-push-images-prod: generate-webapp
 	docker buildx build -t keyval/kv-mall-coupon:v0.2 $(PROJECT_DIR)coupon -f $(PROJECT_DIR)coupon/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t keyval/kv-mall-membership:v0.2 $(PROJECT_DIR)membership -f $(PROJECT_DIR)membership/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t keyval/kv-mall-analytics:v0.2 $(PROJECT_DIR)analytics -f $(PROJECT_DIR)analytics/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-load-generator:v0.2 $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile --platform linux/amd64,linux/arm64 --push
