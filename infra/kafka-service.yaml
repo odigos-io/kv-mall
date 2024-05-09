@@ -19,5 +19,3 @@ spec:
       targetPort: 9093
   selector:
     io.kompose.service: kafka
-status:
-  loadBalancer: {}
