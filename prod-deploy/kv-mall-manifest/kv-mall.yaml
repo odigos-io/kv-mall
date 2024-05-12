@@ -283,6 +283,29 @@ spec:
 
 
 # Infrastructure
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kafka
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: memcached
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cassandra
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: postgres
+---
+
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
