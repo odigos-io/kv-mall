@@ -17,6 +17,7 @@ KV Mall contains the following services:
 | Coupon | JavaScript | NodeJS 18.3.0        |
 | Analytics | Go         | 1.18                 |
 | Warehouse | Java | 11 (Eclipse Temurin) |
+| Load-generator | Go | 1.21 |
 
 ## Infrastructure
 
