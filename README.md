@@ -47,3 +47,8 @@ To build the project and run it locally on a Kind cluster, run the following com
 make build-images load-to-kind deploy
 ```
 
+## Deploying kv-mall in k8s
+```bash
+kubectl apply -f https://raw.githubusercontent.com/odigos-io/kv-mall/main/prod-deploy/kv-mall-manifest/kv-mall.yaml
+```
+

@@ -24,12 +24,12 @@ spec:
         - name: CASSANDRA_ADDR
           value: cassandra.kv-mall-infra:9042
         - name: POSTGRESQL_ADDR
-          value: postgresql://postgres:postgres@postgres.postgres:5432/postgres?sslmode=disable
+          value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
         - name: COSMOS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: cosmos
-                key: COSMOS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cosmos
+              key: COSMOS_KEY
         startupProbe:
           httpGet:
             path: /health

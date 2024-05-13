@@ -8,7 +8,7 @@ metadata:
   labels:
     io.kompose.service: kafka
   name: kafka
-  namespace: kafka
+  namespace: kv-mall-infra
 spec:
   replicas: 1
   selector:
