@@ -35,7 +35,7 @@ spec:
             - name: KAFKA_ADVERTISED_HOST_NAME
               value: localhost
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: PLAINTEXT://kafka-service.kafka:9092,SASL_PLAINTEXT://kafka-service.kafka:9093
+              value: PLAINTEXT://kafka-service.kv-mall-infra:9092,SASL_PLAINTEXT://kafka-service.kv-mall-infra:9093
             - name: KAFKA_ADVERTISED_PORT
               value: "9092"
             - name: KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND

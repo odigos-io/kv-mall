@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type memcached struct {
+type Memcached struct {
 	mc *memcache.Client
 }
 
@@ -22,15 +22,18 @@ func NewMemcached() (Persister, error) {
 		return nil, err
 	}
 
-	slog.Info("Connected to memcached")
-	return &memcached{mc: mc}, nil
+	return &Memcached{mc: mc}, nil
 }
 
-func (m *memcached) Persist(data []byte) error {
+func (m *Memcached) Persist(data []byte) error {
 	slog.Info("persisting data to memcached")
 	return m.mc.Set(&memcache.Item{Key: "foo", Value: data})
 }
 
-func (m *memcached) Close() {
+func (m *Memcached) Close() {
 	m.mc.Close()
+}
+
+func (m *Memcached) SetupDB() error {
+	return nil
 }

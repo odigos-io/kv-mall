@@ -18,15 +18,26 @@ spec:
         image: dev/analytics:dev
         env:
         - name: KAFKA_ADDRESS
-          value: kafka-service.kafka:9092
+          value: kafka-service.kv-mall-infra:9092
         - name: MEMCACHED_ADDR
-          value: memcached.memcached:11211
+          value: memcached.kv-mall-infra:11211
         - name: CASSANDRA_ADDR
-          value: cassandra.cassandra:9042
+          value: cassandra.kv-mall-infra:9042
         - name: POSTGRESQL_ADDR
           value: postgresql://postgres:postgres@postgres.postgres:5432/postgres?sslmode=disable
         - name: COSMOS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: cosmos
-              key: COSMOS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: cosmos
+                key: COSMOS_KEY
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 100
+        ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP

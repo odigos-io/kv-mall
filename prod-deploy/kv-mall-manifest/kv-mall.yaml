@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: analytics
-        image: keyval/kv-mall-analytics:v0.2
+        image: keyval/kv-mall-analytics:v0.5
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -25,6 +25,17 @@ spec:
           value: cassandra.kv-mall-infra:9042
         - name: POSTGRESQL_ADDR
           value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 100
+        ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -89,12 +100,14 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: keyval/kv-mall-frontend:v0.2
+        image: keyval/kv-mall-frontend:v0.3
         env:
         - name: INVENTORY_SERVICE_HOST
           value: inventory:8080
         - name: PRICING_SERVICE_HOST
           value: pricing:8080
+        - name: COUPON_SERVICE_HOST
+          value: coupon:8080
         ports:
         - containerPort: 8080
 ---
@@ -127,7 +140,7 @@ spec:
     spec:
       containers:
       - name: inventory
-        image: keyval/kv-mall-inventory:v0.2
+        image: keyval/kv-mall-inventory:v0.3
         ports:
         - containerPort: 8080
 ---
@@ -265,7 +278,7 @@ spec:
     spec:
       containers:
       - name: warehouse
-        image: dev/warehouse:dev
+        image: keyval/kv-mall-warehouse:v0.3
         ports:
         - containerPort: 8080
 ---
@@ -287,22 +300,7 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kafka
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: memcached
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cassandra
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: postgres
+  name: kv-mall-infra
 ---
 
 
@@ -310,7 +308,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cassandra
-  namespace: cassandra
+  namespace: kv-mall-infra
 spec:
   selector:
     matchLabels:
@@ -334,7 +332,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cassandra
-  namespace: cassandra
+  namespace: kv-mall-infra
 spec:
     selector:
         app: cassandra
@@ -355,7 +353,7 @@ metadata:
   labels:
     io.kompose.service: kafka
   name: kafka
-  namespace: kafka
+  namespace: kv-mall-infra
 spec:
   replicas: 1
   selector:
@@ -379,7 +377,7 @@ spec:
             - name: KAFKA_CFG_NODE_ID
               value: "0"
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
-              value: PLAINTEXT://kafka-service.kafka:9092
+              value: PLAINTEXT://kafka-service.kv-mall-infra:9092
             - name: KAFKA_CFG_LISTENERS
               value: PLAINTEXT://:9092,CONTROLLER://:9093
             - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
@@ -411,7 +409,7 @@ metadata:
   labels:
     io.kompose.service: kafka
   name: kafka-service
-  namespace: kafka
+  namespace: kv-mall-infra
 spec:
   ports:
     - name: "9092"
@@ -429,7 +427,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: memcached
-  namespace: memcached
+  namespace: kv-mall-infra
 spec:
   selector:
     matchLabels:
@@ -450,7 +448,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: memcached
-  namespace: memcached
+  namespace: kv-mall-infra
 spec:
   selector:
     app: memcached
@@ -464,7 +462,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: postgres
+  namespace: kv-mall-infra
   labels:
     app: postgres
 spec:
@@ -493,7 +491,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
-  namespace: postgres
+  namespace: kv-mall-infra
 spec:
     selector:
         app: postgres

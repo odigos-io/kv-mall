@@ -16,7 +16,7 @@ import java.util.Map;
 public class App 
 {
 
-    private static final String KAFKA_SERVERS = "kafka-service.kafka:9092";
+    private static final String KAFKA_SERVERS = "kafka-service.kv-mall-infra:9092";
     private static final Logger logger = LoggerFactory.getLogger(App.class);
     public static void main( String[] args )
     {
