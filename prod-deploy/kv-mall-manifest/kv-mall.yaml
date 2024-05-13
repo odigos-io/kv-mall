@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: analytics
-        image: keyval/kv-mall-analytics:v0.5
+        image: keyval/kv-mall-analytics:v0.6
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -173,7 +173,7 @@ spec:
     spec:
       containers:
       - name: load-generator
-        image: keyval/kv-mall-load-generator:v0.2
+        image: keyval/kv-mall-load-generator:v0.3
         env:
         - name: BUY_PRODUCT_INTERVAL
           value: "2s"
@@ -209,7 +209,7 @@ spec:
     spec:
       containers:
       - name: membership
-        image: keyval/kv-mall-membership:v0.2
+        image: keyval/kv-mall-membership:v0.4
         env:
           - name: KAFKA_ADDRESS
             value: kafka-service.kv-mall-infra:9092
