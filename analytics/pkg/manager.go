@@ -27,28 +27,34 @@ func (m *Manager) WithMessageQueue(mq messagequeue.MessageQueue) *Manager {
 	return m
 }
 
-func (m *Manager) Run() {
+func (m *Manager) Run(ctx context.Context) {
 	for {
-		msgs, err := m.mq.ReadMessages(context.Background())
-		if err != nil {
-			slog.Info("failed to read messages", "error", err)
-			continue
-		}
-
-		slog.Info("read messages", "count", len(msgs))
-		for _, msg := range msgs {
-			data, err := m.mq.DeserializeMessage(msg)
+		select {
+		case <-ctx.Done():
+			slog.Info("context cancelled, exiting")
+			return
+		default:
+			msgs, err := m.mq.ReadMessages(ctx)
 			if err != nil {
-				slog.Info("failed to deserialize message", "error", err)
+				slog.Info("failed to read messages", "error", err)
+				continue
 			}
 
-			slog.Info("persisting data in parallel", "data", string(data))
-			t0 := time.Now()
-			err = m.PersistParallel(data)
-			if err != nil {
-				slog.Info("failed to persist data", "error", err)
+			slog.Info("read messages", "count", len(msgs))
+			for _, msg := range msgs {
+				data, err := m.mq.DeserializeMessage(msg)
+				if err != nil {
+					slog.Info("failed to deserialize message", "error", err)
+				}
+
+				slog.Info("persisting data in parallel", "data", string(data))
+				t0 := time.Now()
+				err = m.PersistParallel(data)
+				if err != nil {
+					slog.Info("failed to persist data", "error", err)
+				}
+				slog.Info("persisted data in parallel", "time", time.Since(t0).String())
 			}
-			slog.Info("persisted data in parallel", "time", time.Since(t0).String())
 		}
 	}
 }

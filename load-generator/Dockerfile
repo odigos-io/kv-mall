@@ -1,4 +1,4 @@
-FROM golang:1.21 as builder
+FROM golang:1.21.2 as builder
 WORKDIR /go/src/app
 COPY . .
 RUN go build -o /go/bin/load-generator main.go

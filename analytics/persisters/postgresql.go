@@ -11,7 +11,7 @@ type Postgresql struct {
 	client *sql.DB
 }
 
-func NewPostgresql() (*Postgresql, error) {
+func NewPostgresql() (Persister, error) {
 	addr, exists := os.LookupEnv("POSTGRESQL_ADDR")
 	if !exists {
 		addr = "localhost:5432"
@@ -22,7 +22,6 @@ func NewPostgresql() (*Postgresql, error) {
 		return nil, err
 	}
 
-	slog.Info("Connected to postgresql")
 	return &Postgresql{
 		client: db,
 	}, nil

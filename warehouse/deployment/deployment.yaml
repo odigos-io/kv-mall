@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: inventory
+  name: warehouse
   labels:
-    app: inventory
+    app: warehouse
 spec:
   selector:
     matchLabels:
-      app: inventory
+      app: warehouse
   template:
     metadata:
       labels:
-        app: inventory
+        app: warehouse
     spec:
       containers:
-      - name: inventory
-        image: keyval/kv-mall-inventory:v0.2
+      - name: warehouse
+        image: dev/warehouse:dev
         ports:
         - containerPort: 8080
   

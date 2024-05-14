@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: load-generator
+  name: warehouse
 spec:
   selector:
-    app: load-generator
+    app: warehouse
   ports:
     - protocol: TCP
       port: 8080

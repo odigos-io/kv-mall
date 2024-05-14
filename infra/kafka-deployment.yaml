@@ -8,7 +8,7 @@ metadata:
   labels:
     io.kompose.service: kafka
   name: kafka
-  namespace: kafka
+  namespace: kv-mall-infra
 spec:
   replicas: 1
   selector:
@@ -32,7 +32,7 @@ spec:
             - name: KAFKA_CFG_NODE_ID
               value: "0"
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
-              value: PLAINTEXT://kafka-service.kafka:9092
+              value: PLAINTEXT://kafka-service.kv-mall-infra:9092
             - name: KAFKA_CFG_LISTENERS
               value: PLAINTEXT://:9092,CONTROLLER://:9093
             - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP

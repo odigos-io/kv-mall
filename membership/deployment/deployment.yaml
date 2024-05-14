@@ -18,7 +18,6 @@ spec:
         image: dev/membership:dev
         env:
           - name: KAFKA_ADDRESS
-            value: kafka-service.kafka:9092
+            value: kafka-service.kv-mall-infra:9092
         ports:
-        - containerPort: 8080
-  
+          - containerPort: 8080
