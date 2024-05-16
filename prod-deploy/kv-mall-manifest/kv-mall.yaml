@@ -54,18 +54,8 @@ spec:
     spec:
       containers:
       - name: coupon
-        image: keyval/kv-mall-coupon:v0.2
+        image: keyval/kv-mall-coupon:v0.3
         env:
-          - name: NODE_IP
-            valueFrom:
-              fieldRef:
-                fieldPath: status.hostIP
-          - name: OTEL_TRACES_EXPORTER
-            value: otlp
-          - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            value: "http://$(NODE_IP):4318"
-          - name: OTEL_SERVICE_NAME
-            value: coupon
           - name: MEMBERSHIP_SERVICE_URL
             value: "membership:8080"
         ports:
