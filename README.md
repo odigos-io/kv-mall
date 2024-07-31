@@ -13,10 +13,11 @@ KV Mall contains the following services:
 | Frontend | Java       | 17 (Eclipse Temurin) |
 | Inventory | Java       | 11 (Eclipse Temurin) |
 | Pricing | Java       | 8 (Eclipse Temurin)  |
-| Membership | Go         | 1.21                 |
+| Membership | Go         | 1.22.1               |
 | Coupon | JavaScript | NodeJS 18.3.0        |
-| Analytics | Go         | 1.18                 |
+| Analytics | Go         | 1.21.2                 |
 | Warehouse | Java | 11 (Eclipse Temurin) |
+| Load-generator | Go | 1.21.2 |
 
 ## Infrastructure
 
@@ -44,5 +45,10 @@ To build the project and run it locally on a Kind cluster, run the following com
 
 ```bash
 make build-images load-to-kind deploy
+```
+
+## Deploying kv-mall in k8s
+```bash
+kubectl apply -f https://raw.githubusercontent.com/odigos-io/kv-mall/main/prod-deploy/kv-mall-manifest/kv-mall.yaml
 ```
 

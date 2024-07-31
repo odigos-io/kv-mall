@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: membership
+  name: warehouse
 spec:
   selector:
-    app: membership
+    app: warehouse
   ports:
     - protocol: TCP
       port: 8080

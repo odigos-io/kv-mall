@@ -22,7 +22,7 @@ func IsCosmosAvailable() bool {
 	return os.Getenv("COSMOS_KEY") != ""
 }
 
-func NewCosmos() (*Cosmos, error) {
+func NewCosmos() (Persister, error) {
 	host := getCosmosHost()
 	key, exists := os.LookupEnv("COSMOS_KEY")
 	if !exists {
@@ -50,7 +50,6 @@ func NewCosmos() (*Cosmos, error) {
 		return nil, err
 	}
 
-	slog.Info("Connected to cosmos")
 	return &Cosmos{
 		client:          client,
 		dbClient:        db,

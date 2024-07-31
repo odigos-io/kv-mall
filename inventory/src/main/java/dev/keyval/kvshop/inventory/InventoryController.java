@@ -1,5 +1,8 @@
 package dev.keyval.kvshop.inventory;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +14,12 @@ import java.util.List;
 public class InventoryController {
 
     private static final List<InventoryItem> items = loadItems();
+    private final KafkaProducer<String, String> producer;
+
+    @Autowired
+    public InventoryController(InventoryKafkaProducer producer) {
+        this.producer = producer.getProducer();
+    }
 
     @GetMapping("/inventory")
     public List<InventoryItem> getInventory() {
@@ -21,7 +30,10 @@ public class InventoryController {
     @PostMapping("/buy")
     public void buyProduct(@RequestParam int id) throws InterruptedException {
         System.out.println("Buying product with id " + id);
-        Thread.sleep(1000);
+        ProducerRecord<String, String> record = new ProducerRecord<>("orders", "" + id, "Product with id " + id + " has been bought");
+        record.headers().add("product-id", String.valueOf(id).getBytes());
+        this.producer.send(record);
+        this.producer.flush();
     }
 
     private static List<InventoryItem> loadItems() {

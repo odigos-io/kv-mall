@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: coupon
+  name: load-generator
 spec:
   selector:
-    app: coupon
+    app: load-generator
   ports:
     - protocol: TCP
       port: 8080

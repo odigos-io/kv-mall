@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/segmentio/kafka-go"
 
 	"os"
@@ -21,6 +22,7 @@ func getKafkaAddress() string {
 }
 
 func NewKafkaClient() *KafkaMessageQueue {
+	kafka.DialLeader(context.Background(), "tcp", getKafkaAddress(), "analytics", 0)
 	return &KafkaMessageQueue{
 		writer: &kafka.Writer{
 			Addr:  kafka.TCP(getKafkaAddress()),

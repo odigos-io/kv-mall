@@ -10,7 +10,7 @@ type Cassandra struct {
 	session *gocql.Session
 }
 
-func NewCassandra() (*Cassandra, error) {
+func NewCassandra() (Persister, error) {
 	addr, exists := os.LookupEnv("CASSANDRA_ADDR")
 	if !exists {
 		addr = "localhost:9042"
@@ -22,7 +22,6 @@ func NewCassandra() (*Cassandra, error) {
 		return nil, err
 	}
 
-	slog.Info("Connected to cassandra")
 	return &Cassandra{session: session}, nil
 }
 

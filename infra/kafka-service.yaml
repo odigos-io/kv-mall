@@ -8,7 +8,7 @@ metadata:
   labels:
     io.kompose.service: kafka
   name: kafka-service
-  namespace: kafka
+  namespace: kv-mall-infra
 spec:
   ports:
     - name: "9092"
@@ -19,5 +19,3 @@ spec:
       targetPort: 9093
   selector:
     io.kompose.service: kafka
-status:
-  loadBalancer: {}
