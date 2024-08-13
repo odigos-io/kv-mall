@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ads
+spec:
+  selector:
+    app: ads
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
