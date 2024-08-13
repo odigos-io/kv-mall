@@ -60,7 +60,7 @@ def main():
     PORT = int(os.getenv('PORT', '8080'))
     listener = None
 
-    engine = create_engine("mysql+pymysql://adsuser:adspass@mysql.mysql:3306/adsdb")
+    engine = create_engine("mysql+pymysql://adsuser:adspass@mysql.kv-mall-infra:3306/adsdb")
     if propagator is not None:
         app.logger.info("Using OpenTelemetry")
         listener = BeforeExecuteFactory(with_opentelemetry=True)
