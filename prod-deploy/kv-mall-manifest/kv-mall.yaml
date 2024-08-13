@@ -237,7 +237,7 @@ spec:
     spec:
       containers:
       - name: pricing
-        image: keyval/kv-mall-pricing:v0.2
+        image: keyval/kv-mall-pricing:v0.3
         ports:
         - containerPort: 8080
 ---
