@@ -32,6 +32,7 @@ load-to-kind:
 	kind load docker-image dev/ads:dev
 	kind load docker-image dev/warehouse:dev
 	kind load docker-image dev/load-generator:dev
+	kind load docker-image dev/nginx:dev
 
 .PHONY: deploy
 deploy:
@@ -45,12 +46,14 @@ deploy:
 	kubectl apply -f $(PROJECT_DIR)ads/deployment/
 	kubectl apply -f $(PROJECT_DIR)warehouse/deployment/
 	kubectl apply -f $(PROJECT_DIR)load-generator/deployment/
+	kubectl apply -f $(PROJECT_DIR)nginx/deployment/
 
 .PHONY: deploy-infra
 deploy-infra:
 	@echo "Deploying infra to Kubernetes..."
 	kubectl apply -f $(PROJECT_DIR)infra/namespaces.yaml
 	kubectl apply -f $(PROJECT_DIR)infra/
+
 
 .PHONY: restart
 restart:
@@ -69,3 +72,12 @@ build-push-images-prod: generate-webapp
 	docker buildx build -t keyval/kv-mall-ads:v0.3 $(PROJECT_DIR)ads -f $(PROJECT_DIR)ads/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t keyval/kv-mall-warehouse:v0.3 $(PROJECT_DIR)warehouse -f $(PROJECT_DIR)warehouse/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t keyval/kv-mall-load-generator:v0.3 $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t keyval/kv-mall-nginx:v0.3 $(PROJECT_DIR)nginx -f $(PROJECT_DIR)nginx/Dockerfile --platform linux/amd64,linux/amd64 --push
+
+
+.PHONY: deploy-nginx
+deploy-nginx:
+	docker build -t dev/nginx:dev $(PROJECT_DIR)nginx -f $(PROJECT_DIR)nginx/Dockerfile --platform linux/amd64
+	kind load docker-image dev/nginx:dev
+	kubectl apply -f $(PROJECT_DIR)nginx/deployment/
+
