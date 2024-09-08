@@ -19,6 +19,7 @@ build-images: generate-webapp
 	docker build -t dev/ads:dev $(PROJECT_DIR)ads -f $(PROJECT_DIR)ads/Dockerfile
 	docker build -t dev/warehouse:dev $(PROJECT_DIR)warehouse -f $(PROJECT_DIR)warehouse/Dockerfile
 	docker build -t dev/load-generator:dev $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile
+	docker build -t dev/nginx:dev $(PROJECT_DIR)nginx -f $(PROJECT_DIR)nginx/Dockerfile
 
 .PHONY: load-to-kind
 load-to-kind:
@@ -72,7 +73,7 @@ build-push-images-prod: generate-webapp
 	docker buildx build -t keyval/kv-mall-ads:v0.3 $(PROJECT_DIR)ads -f $(PROJECT_DIR)ads/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t keyval/kv-mall-warehouse:v0.3 $(PROJECT_DIR)warehouse -f $(PROJECT_DIR)warehouse/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t keyval/kv-mall-load-generator:v0.3 $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile --platform linux/amd64,linux/arm64 --push
-	docker buildx build -t keyval/kv-mall-nginx:v0.3 $(PROJECT_DIR)nginx -f $(PROJECT_DIR)nginx/Dockerfile --platform linux/amd64,linux/amd64 --push
+	docker buildx build -t keyval/kv-mall-nginx:v0.3 $(PROJECT_DIR)nginx -f $(PROJECT_DIR)nginx/Dockerfile --platform linux/amd64 --push
 
 
 .PHONY: deploy-nginx
