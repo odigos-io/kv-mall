@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: dev/nginx:dev
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: html
+              mountPath: "/usr/share/nginx/html/"
+      volumes:
+        - name: html
+          configMap:
+            name: nginx
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx
+data:
+  path-a.html: |
+    "/path-a.html" on nginx
+  path-b.html: |
+    "/path-b.html" on nginx
+  index.html: |
+    "/" on nginx
+  404.html: |
+    nginx 404 page
