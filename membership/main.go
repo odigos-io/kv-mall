@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/segmentio/kafka-go"
 	"log/slog"
 	"net/http"
 	"strconv"
+
+	"github.com/segmentio/kafka-go"
 )
 
 const (
@@ -41,12 +42,6 @@ func main() {
 		}, kafka.Message{
 			Key:   []byte("test-message"),
 			Value: []byte("test-value"),
-			Headers: []kafka.Header{
-				{
-					Key:   "test-header",
-					Value: []byte("test-value"),
-				},
-			},
 		})
 
 		if err != nil {
