@@ -19,6 +19,8 @@ spec:
         env:
           - name: MEMBERSHIP_SERVICE_URL
             value: "membership:8080"
+          - name: KAFKA_ADDRESS
+            value: "kafka-service.kv-mall-infra:9092"
         ports:
         - containerPort: 8080
 

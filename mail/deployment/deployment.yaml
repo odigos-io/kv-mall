@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mail
+  labels:
+    app: mail
+spec:
+  selector:
+    matchLabels:
+      app: mail
+  template:
+    metadata:
+      labels:
+        app: mail
+    spec:
+      containers:
+      - name: mail
+        image: keyval/kv-mall-mail:v0.3
+        env:
+        - name: KAFKA_ADDRESS
+          value: "kafka-service.kv-mall-infra:9092"
