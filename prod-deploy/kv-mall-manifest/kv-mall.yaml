@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: coupon
-        image: keyval/kv-mall-coupon:v0.3
+        image: keyval/kv-mall-coupon:v0.4
         env:
         - name: MEMBERSHIP_SERVICE_URL
           value: "membership:8080"
