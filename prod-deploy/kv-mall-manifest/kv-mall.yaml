@@ -54,10 +54,12 @@ spec:
     spec:
       containers:
       - name: coupon
-        image: keyval/kv-mall-coupon:v0.3
+        image: keyval/kv-mall-coupon:v0.4
         env:
-          - name: MEMBERSHIP_SERVICE_URL
-            value: "membership:8080"
+        - name: MEMBERSHIP_SERVICE_URL
+          value: "membership:8080"
+        - name: KAFKA_ADDRESS
+          value: "kafka-service.kv-mall-infra:9092"
         ports:
         - containerPort: 8080
 ---
@@ -72,6 +74,28 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mail
+  labels:
+    app: mail
+spec:
+  selector:
+    matchLabels:
+      app: mail
+  template:
+    metadata:
+      labels:
+        app: mail
+    spec:
+      containers:
+      - name: mail
+        image: keyval/kv-mall-mail:v0.3
+        env:
+        - name: KAFKA_ADDRESS
+          value: "kafka-service.kv-mall-infra:9092"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -203,8 +227,8 @@ spec:
       - name: membership
         image: keyval/kv-mall-membership:v0.4
         env:
-          - name: KAFKA_ADDRESS
-            value: kafka-service.kv-mall-infra:9092
+        - name: KAFKA_ADDRESS
+          value: kafka-service.kv-mall-infra:9092
         ports:
         - containerPort: 8080
 ---
