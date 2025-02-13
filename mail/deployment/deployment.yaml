@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: mail
-        image: keyval/kv-mall-mail:dev
+        image: kv-mall-mail:dev
         env:
         - name: KAFKA_ADDRESS
           value: "kafka-service.kv-mall-infra:9092"
