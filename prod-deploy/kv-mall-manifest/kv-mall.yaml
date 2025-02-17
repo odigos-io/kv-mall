@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: analytics
-        image: keyval/kv-mall-analytics:v0.6
+        image: registry.odigos.io/kv-mall-analytics:v0.6
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: coupon
-        image: keyval/kv-mall-coupon:v0.4
+        image: registry.odigos.io/kv-mall-coupon:v0.4
         env:
         - name: MEMBERSHIP_SERVICE_URL
           value: "membership:8080"
@@ -92,7 +92,7 @@ spec:
     spec:
       containers:
       - name: mail
-        image: keyval/kv-mall-mail:v0.3
+        image: registry.odigos.io/kv-mall-mail:v0.3
         env:
         - name: KAFKA_ADDRESS
           value: "kafka-service.kv-mall-infra:9092"
@@ -114,7 +114,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: keyval/kv-mall-frontend:v0.3
+        image: registry.odigos.io/kv-mall-frontend:v0.3
         env:
         - name: INVENTORY_SERVICE_HOST
           value: inventory:8080
@@ -156,7 +156,7 @@ spec:
     spec:
       containers:
       - name: inventory
-        image: keyval/kv-mall-inventory:v0.3
+        image: registry.odigos.io/kv-mall-inventory:v0.3
         ports:
         - containerPort: 8080
 ---
@@ -189,7 +189,7 @@ spec:
     spec:
       containers:
       - name: load-generator
-        image: keyval/kv-mall-load-generator:v0.3
+        image: registry.odigos.io/kv-mall-load-generator:v0.3
         env:
         - name: BUY_PRODUCT_INTERVAL
           value: "2s"
@@ -225,7 +225,7 @@ spec:
     spec:
       containers:
       - name: membership
-        image: keyval/kv-mall-membership:v0.4
+        image: registry.odigos.io/kv-mall-membership:v0.4
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -261,7 +261,7 @@ spec:
     spec:
       containers:
       - name: pricing
-        image: keyval/kv-mall-pricing:v0.3
+        image: registry.odigos.io/kv-mall-pricing:v0.3
         ports:
         - containerPort: 8080
 ---
@@ -294,7 +294,7 @@ spec:
     spec:
       containers:
       - name: warehouse
-        image: keyval/kv-mall-warehouse:v0.3
+        image: registry.odigos.io/kv-mall-warehouse:v0.3
         ports:
         - containerPort: 8080
 ---
@@ -607,7 +607,7 @@ spec:
     spec:
       containers:
         - name: ads
-          image: keyval/kv-mall-ads:v0.3
+          image: registry.odigos.io/kv-mall-ads:v0.3
           ports:
             - containerPort: 8080
           securityContext:
