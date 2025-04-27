@@ -65,7 +65,7 @@ restart:
 .PHONY: build-push-images-prod
 build-push-images-prod: generate-webapp
 	@echo "Building images..."
-	docker buildx build -t ${REGISTRY}/kv-mall-frontend:v0.3 $(PROJECT_DIR)frontend -f $(PROJECT_DIR)frontend/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t ${REGISTRY}/kv-mall-frontend:v0.4 $(PROJECT_DIR)frontend -f $(PROJECT_DIR)frontend/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t ${REGISTRY}/kv-mall-inventory:v0.3 $(PROJECT_DIR)inventory -f $(PROJECT_DIR)inventory/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t ${REGISTRY}/kv-mall-pricing:v0.3 $(PROJECT_DIR)pricing -f $(PROJECT_DIR)pricing/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t ${REGISTRY}/kv-mall-coupon:v0.4 $(PROJECT_DIR)coupon -f $(PROJECT_DIR)coupon/Dockerfile --platform linux/amd64,linux/arm64 --push
@@ -75,6 +75,7 @@ build-push-images-prod: generate-webapp
 	docker buildx build -t ${REGISTRY}/kv-mall-ads:v0.3 $(PROJECT_DIR)ads -f $(PROJECT_DIR)ads/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t ${REGISTRY}/kv-mall-warehouse:v0.3 $(PROJECT_DIR)warehouse -f $(PROJECT_DIR)warehouse/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t ${REGISTRY}/kv-mall-load-generator:v0.3 $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t ${REGISTRY}/kv-mall-currency:v0.1 $(PROJECT_DIR)currency -f $(PROJECT_DIR)currency/Dockerfile --platform linux/amd64,linux/arm64 --push
 
 
 .PHONY: deploy-nginx
