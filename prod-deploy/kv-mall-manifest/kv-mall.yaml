@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kv-mall
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: analytics
+  namespace: kv-mall
   labels:
     app: analytics
 spec:
@@ -41,6 +47,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: coupon
+  namespace: kv-mall
   labels:
     app: coupon
 spec:
@@ -67,6 +74,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: coupon
+  namespace: kv-mall
 spec:
   selector:
     app: coupon
@@ -79,6 +87,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mail
+  namespace: kv-mall
   labels:
     app: mail
 spec:
@@ -101,6 +110,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  namespace: kv-mall
   labels:
     app: frontend
 spec:
@@ -114,7 +124,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: registry.odigos.io/kv-mall-frontend:v0.3
+          image: registry.odigos.io/kv-mall-frontend:v0.4
           env:
             - name: INVENTORY_SERVICE_HOST
               value: inventory:8080
@@ -124,6 +134,8 @@ spec:
               value: coupon:8080
             - name: ADS_SERVICE_HOST
               value: ads:8080
+            - name: CURRENCY_SERVICE_HOST
+              value: currency:8080
           ports:
             - containerPort: 8080
 ---
@@ -131,6 +143,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: frontend
+  namespace: kv-mall
 spec:
   selector:
     app: frontend
@@ -143,6 +156,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: inventory
+  namespace: kv-mall
   labels:
     app: inventory
 spec:
@@ -164,6 +178,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: inventory
+  namespace: kv-mall
 spec:
   selector:
     app: inventory
@@ -176,6 +191,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: load-generator
+  namespace: kv-mall
   labels:
     app: load-generator
 spec:
@@ -200,6 +216,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: load-generator
+  namespace: kv-mall
 spec:
   selector:
     app: load-generator
@@ -212,6 +229,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: membership
+  namespace: kv-mall
   labels:
     app: membership
 spec:
@@ -236,6 +254,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: membership
+  namespace: kv-mall
 spec:
   selector:
     app: membership
@@ -248,6 +267,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pricing
+  namespace: kv-mall
   labels:
     app: pricing
 spec:
@@ -269,6 +289,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: pricing
+  namespace: kv-mall
 spec:
   selector:
     app: pricing
@@ -281,6 +302,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: warehouse
+  namespace: kv-mall
   labels:
     app: warehouse
 spec:
@@ -302,6 +324,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: warehouse
+  namespace: kv-mall
 spec:
   selector:
     app: warehouse
@@ -310,8 +333,82 @@ spec:
       port: 8080
       targetPort: 8080
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ads
+  namespace: kv-mall
+  labels:
+    app: ads
+spec:
+  selector:
+    matchLabels:
+      app: ads
+  template:
+    metadata:
+      labels:
+        app: ads
+    spec:
+      containers:
+        - name: ads
+          image: registry.odigos.io/kv-mall-ads:v0.3
+          ports:
+            - containerPort: 8080
+          env:
+            - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
+              value: sqlalchemy,pymysql
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ads
+  namespace: kv-mall
+spec:
+  selector:
+    app: ads
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: currency
+  namespace: kv-mall
+  labels:
+    app: currency
+spec:
+  selector:
+    matchLabels:
+      app: currency
+  template:
+    metadata:
+      labels:
+        app: currency
+    spec:
+      containers:
+        - name: currency
+          image: registry.odigos.io/kv-mall-currency:v0.1
+          ports:
+            - containerPort: 8080
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: currency
+  namespace: kv-mall
+spec:
+  selector:
+    app: currency
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+##################################################
 # Infrastructure
-
+##################################################
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -582,41 +679,3 @@ spec:
       targetPort: 3306
   selector:
     app: mysql
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ads
-  labels:
-    app: ads
-spec:
-  selector:
-    matchLabels:
-      app: ads
-  template:
-    metadata:
-      labels:
-        app: ads
-    spec:
-      containers:
-        - name: ads
-          image: registry.odigos.io/kv-mall-ads:v0.3
-          ports:
-            - containerPort: 8080
-          securityContext:
-            runAsUser: 1000
-          env:
-            - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
-              value: sqlalchemy,pymysql
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: ads
-spec:
-  selector:
-    app: ads
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
