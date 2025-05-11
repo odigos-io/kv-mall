@@ -124,6 +124,7 @@ spec:
     spec:
       containers:
         - name: frontend
+          # !! need to bump tag to include currency change from ILS to EUR
           image: registry.odigos.io/kv-mall-frontend:v0.4
           env:
             - name: INVENTORY_SERVICE_HOST
