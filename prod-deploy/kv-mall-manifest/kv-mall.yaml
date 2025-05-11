@@ -375,6 +375,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: currency
+  namespace: kv-mall
   labels:
     app: currency
 spec:
@@ -411,6 +412,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: currency-nginx-config
+  namespace: kv-mall
 data:
   nginx.conf: |
     server {
@@ -428,6 +430,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: currency
+  namespace: kv-mall
 spec:
   selector:
     app: currency
