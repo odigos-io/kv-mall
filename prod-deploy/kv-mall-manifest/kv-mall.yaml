@@ -375,7 +375,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: currency
-  namespace: kv-mall
   labels:
     app: currency
 spec:
@@ -389,15 +388,46 @@ spec:
     spec:
       containers:
         - name: currency
-          image: registry.odigos.io/kv-mall-currency:v0.1
+          # !! note the image is taken from simple-demo
+          #    it's OK to change to kv-mall after a new tag has been pushed (v0.1.1)
+          #    originally: registry.odigos.io/kv-mall-currency:v0.1
+          image: registry.odigos.io/odigos-demo-currency:v0.1.18
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+        - name: nginx
+          image: nginx:latest
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: currency-nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: currency-nginx-config
+data:
+  nginx.conf: |
+    server {
+        listen 8080;
+        server_name localhost;
+
+        location / {
+            include fastcgi_params;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME /app/index.php;
+        }
+    }
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: currency
-  namespace: kv-mall
 spec:
   selector:
     app: currency
