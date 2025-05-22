@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendations
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendations
+  template:
+    metadata:
+      labels:
+        app: recommendations
+    spec:
+      containers:
+      - name: recommendations
+        image: dev/recommendations:dev
+        ports:
+        - containerPort: 8081 

@@ -171,7 +171,7 @@ spec:
     spec:
       containers:
         - name: inventory
-          image: registry.odigos.io/kv-mall-inventory:v0.3
+          image: registry.odigos.io/kv-mall-inventory:v0.31
           ports:
             - containerPort: 8080
 ---
@@ -333,6 +333,41 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendations
+  namespace: kv-mall
+  labels:
+    app: recommendations
+spec:
+  selector:
+    matchLabels:
+      app: recommendations
+  template:
+    metadata:
+      labels:
+        app: recommendations
+    spec:
+      containers:
+        - name: recommendations
+          image: registry.odigos.io/kv-mall-recommendations:v0.1
+          ports:
+            - containerPort: 8081
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: recommendations
+  namespace: kv-mall
+spec:
+  selector:
+    app: recommendations
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
 ---
 apiVersion: apps/v1
 kind: Deployment

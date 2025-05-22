@@ -9,16 +9,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class InventoryController {
 
     private static final List<InventoryItem> items = loadItems();
     private final KafkaProducer<String, String> producer;
+    private final RecommendationsService recommendationsService;
 
     @Autowired
-    public InventoryController(InventoryKafkaProducer producer) {
+    public InventoryController(InventoryKafkaProducer producer, RecommendationsService recommendationsService) {
         this.producer = producer.getProducer();
+        this.recommendationsService = recommendationsService;
     }
 
     @GetMapping("/inventory")
@@ -28,12 +31,21 @@ public class InventoryController {
     }
 
     @PostMapping("/buy")
-    public void buyProduct(@RequestParam int id) throws InterruptedException {
+    public Map<String, Object> buyProduct(@RequestParam int id) throws InterruptedException {
         System.out.println("Buying product with id " + id);
         ProducerRecord<String, String> record = new ProducerRecord<>("orders", "" + id, "Product with id " + id + " has been bought");
         record.headers().add("product-id", String.valueOf(id).getBytes());
         this.producer.send(record);
         this.producer.flush();
+
+        // Get recommendations as part of the same transaction
+        List<String> recommendations = recommendationsService.getRecommendations(id);
+        
+        return Map.of(
+            "status", "success",
+            "product_id", id,
+            "recommendations", recommendations
+        );
     }
 
     private static List<InventoryItem> loadItems() {

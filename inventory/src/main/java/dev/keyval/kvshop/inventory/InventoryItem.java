@@ -5,6 +5,15 @@ public class InventoryItem {
     private String name;
     private String image;
 
+    public InventoryItem() {
+    }
+
+    public InventoryItem(int id, String name, String image) {
+        this.id = id;
+        this.name = name;
+        this.image = image;
+    }
+
     public int getId() {
         return id;
     }
@@ -26,15 +35,6 @@ public class InventoryItem {
     }
 
     public void setImage(String image) {
-        this.image = image;
-    }
-
-    public InventoryItem() {
-    }
-
-    public InventoryItem(int id, String name, String image) {
-        this.id = id;
-        this.name = name;
         this.image = image;
     }
 }

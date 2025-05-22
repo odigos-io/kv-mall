@@ -21,6 +21,7 @@ build-images: generate-webapp
 	docker build -t dev/ads:dev $(PROJECT_DIR)ads -f $(PROJECT_DIR)ads/Dockerfile
 	docker build -t dev/warehouse:dev $(PROJECT_DIR)warehouse -f $(PROJECT_DIR)warehouse/Dockerfile
 	docker build -t dev/load-generator:dev $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile
+	docker build -t dev/recommendations:dev $(PROJECT_DIR)recommendations -f $(PROJECT_DIR)recommendations/Dockerfile
 
 .PHONY: load-to-kind
 load-to-kind:
@@ -35,6 +36,7 @@ load-to-kind:
 	kind load docker-image dev/ads:dev
 	kind load docker-image dev/warehouse:dev
 	kind load docker-image dev/load-generator:dev
+	kind load docker-image dev/recommendations:dev
 
 .PHONY: deploy
 deploy:
@@ -49,6 +51,7 @@ deploy:
 	kubectl apply -f $(PROJECT_DIR)ads/deployment/
 	kubectl apply -f $(PROJECT_DIR)warehouse/deployment/
 	kubectl apply -f $(PROJECT_DIR)load-generator/deployment/
+	kubectl apply -f $(PROJECT_DIR)recommendations/deployment/
 
 .PHONY: deploy-infra
 deploy-infra:
@@ -76,6 +79,7 @@ build-push-images-prod: generate-webapp
 	docker buildx build -t ${REGISTRY}/kv-mall-warehouse:v0.3 $(PROJECT_DIR)warehouse -f $(PROJECT_DIR)warehouse/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t ${REGISTRY}/kv-mall-load-generator:v0.3 $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile --platform linux/amd64,linux/arm64 --push
 	docker buildx build -t ${REGISTRY}/kv-mall-currency:v0.1 $(PROJECT_DIR)currency -f $(PROJECT_DIR)currency/Dockerfile --platform linux/amd64,linux/arm64 --push
+	docker buildx build -t ${REGISTRY}/kv-mall-recommendations:v0.1 $(PROJECT_DIR)recommendations -f $(PROJECT_DIR)recommendations/Dockerfile --platform linux/amd64,linux/arm64 --push
 
 
 .PHONY: deploy-nginx
