@@ -111,13 +111,8 @@ def start_single_lock():
     except Exception as e:
         app.logger.warning(f"Invalid input to /simulate-lock, defaulting to 10s: {e}")
         lock_duration = 10
-
-    thread = threading.Thread(
-        target=single_ads_table_lock, args=(lock_duration,)
-    )
-    thread.daemon = True
-    thread.start()
-
+    
+    single_ads_table_lock(lock_duration)
     app.logger.info(f"🔁 Started one-time lock thread for {lock_duration}s.")
     return jsonify({
         "message": f"Locking started for {lock_duration} seconds"
