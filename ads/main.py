@@ -68,13 +68,13 @@ def ads():
 #         cursor = conn.cursor()
 #         while True:
 #             try:
-#                 app.logger.info(f"🔒 Locking 'ads' table for {lock_duration}s")
+#                 app.logger.info(f"Locking 'ads' table for {lock_duration}s")
 #                 cursor.execute("LOCK TABLES ads WRITE")
 #                 cursor.execute("SHOW OPEN TABLES WHERE In_use > 0")
 
 #                 time.sleep(lock_duration)
 #                 cursor.execute("UNLOCK TABLES")
-#                 app.logger.info("🔓 Lock released")
+#                 app.logger.info("Lock released")
 #                 time.sleep(cooldown)
 #             except Exception as e:
 #                 app.logger.error(f"Lock cycle error: {e}")
@@ -116,7 +116,7 @@ def start_single_lock():
     thread.daemon = True
     thread.start()
 
-    app.logger.info(f"🧵 Started async lock thread for {lock_duration}s.")
+    app.logger.info(f"Started async lock thread for {lock_duration}s.")
     return jsonify({
         "message": f"Asynchronous lock started for {lock_duration} seconds"
     }), 202
