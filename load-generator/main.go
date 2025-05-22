@@ -14,21 +14,20 @@ const (
 	FrontendURL = "http://frontend:8080"
 
 	DefaultBuyProductInterval = 2 * time.Second
-	BuyProductIntervalEnv = "BUY_PRODUCT_INTERVAL"
+	BuyProductIntervalEnv     = "BUY_PRODUCT_INTERVAL"
 
 	DefaultGetProductsInterval = 10 * time.Second
-	GetProductsIntervalEnv = "GET_PRODUCTS_INTERVAL"
+	GetProductsIntervalEnv     = "GET_PRODUCTS_INTERVAL"
 
 	MaxProductID = 20
 	MinProductID = 1
 )
 
-
 type LoadGenerator struct {
-	httpClient *http.Client
-	buyProductInterval time.Duration
+	httpClient          *http.Client
+	buyProductInterval  time.Duration
 	getProductsInterval time.Duration
-	lastProductID int
+	lastProductID       int
 }
 
 func (lg *LoadGenerator) applyEnvVars() {
@@ -53,7 +52,7 @@ func (lg *LoadGenerator) buyProduct(ctx context.Context, productID int) {
 		return
 	}
 
-	resp, err :=lg.httpClient.Do(req)
+	resp, err := lg.httpClient.Do(req)
 
 	if err != nil {
 		fmt.Printf("Error buying product %d: %v\n", productID, err)
@@ -99,6 +98,9 @@ func (lg *LoadGenerator) run(ctx context.Context) {
 		case <-tickerBuyProduct.C:
 			go lg.buyProduct(ctx, lg.lastProductID)
 			lg.lastProductID++
+			if lg.lastProductID == 12 {
+				lg.lastProductID++
+			}
 			if lg.lastProductID > MaxProductID {
 				lg.lastProductID = MinProductID
 			}
@@ -111,10 +113,10 @@ func (lg *LoadGenerator) run(ctx context.Context) {
 func main() {
 	client := &http.Client{}
 	loadGenerator := &LoadGenerator{
-		httpClient: client,
-		buyProductInterval: DefaultBuyProductInterval,
+		httpClient:          client,
+		buyProductInterval:  DefaultBuyProductInterval,
 		getProductsInterval: DefaultGetProductsInterval,
-		lastProductID: MinProductID,
+		lastProductID:       MinProductID,
 	}
 
 	loadGenerator.applyEnvVars()
