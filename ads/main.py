@@ -56,7 +56,33 @@ def ads():
     app.logger.info('ads request received!')
     return jsonify(getads())
 
-def periodic_ads_table_lock(lock_duration: int, cooldown: int):
+# def periodic_ads_table_lock(lock_duration: int, cooldown: int):
+#     try:
+#         conn = pymysql.connect(
+#             host="mysql.kv-mall-infra",
+#             user="adsuser",
+#             password="adspass",
+#             database="adsdb",
+#             autocommit=False
+#         )
+#         cursor = conn.cursor()
+#         while True:
+#             try:
+#                 app.logger.info(f"🔒 Locking 'ads' table for {lock_duration}s")
+#                 cursor.execute("LOCK TABLES ads WRITE")
+#                 cursor.execute("SHOW OPEN TABLES WHERE In_use > 0")
+
+#                 time.sleep(lock_duration)
+#                 cursor.execute("UNLOCK TABLES")
+#                 app.logger.info("🔓 Lock released")
+#                 time.sleep(cooldown)
+#             except Exception as e:
+#                 app.logger.error(f"Lock cycle error: {e}")
+#                 time.sleep(5)
+#     except Exception as e:
+#         app.logger.error(f"Failed to establish locking connection: {e}")
+
+def single_ads_table_lock(lock_duration: int):
     try:
         conn = pymysql.connect(
             host="mysql.kv-mall-infra",
@@ -66,49 +92,37 @@ def periodic_ads_table_lock(lock_duration: int, cooldown: int):
             autocommit=False
         )
         cursor = conn.cursor()
-        while True:
-            try:
-                app.logger.info(f"🔒 Locking 'ads' table for {lock_duration}s")
-                cursor.execute("LOCK TABLES ads WRITE")
-                cursor.execute("SHOW OPEN TABLES WHERE In_use > 0")
-
-                time.sleep(lock_duration)
-                cursor.execute("UNLOCK TABLES")
-                app.logger.info("🔓 Lock released")
-                time.sleep(cooldown)
-            except Exception as e:
-                app.logger.error(f"Lock cycle error: {e}")
-                time.sleep(5)
+        app.logger.info(f"Locking 'ads' table for {lock_duration}s")
+        cursor.execute("LOCK TABLES ads WRITE")
+        time.sleep(lock_duration)
+        cursor.execute("UNLOCK TABLES")
+        app.logger.info("Lock released")
+        cursor.close()
+        conn.close()
     except Exception as e:
-        app.logger.error(f"Failed to establish locking connection: {e}")
+        app.logger.error(f"Error while locking ads table: {e}")
+
 
 @app.route('/simulate-lock', methods=['POST'])
-def start_periodic_lock():
-    global lock_thread_started
+def start_single_lock():
+    try:
+        data = request.get_json(force=True)
+        lock_duration = int(data.get("lock_duration", 10))
+    except Exception as e:
+        app.logger.warning(f"Invalid input to /simulate-lock, defaulting to 10s: {e}")
+        lock_duration = 10
 
-    with lock_thread_lock:
-        if not lock_thread_started:
-            try:
-                data = request.get_json(force=True)
-                lock_duration = int(data.get("lock_duration", 10))
-                cooldown = int(data.get("cooldown", 10))
-            except Exception as e:
-                app.logger.warning(f"Invalid input to /post, defaulting to 10s: {e}")
-                lock_duration = 10
-                cooldown = 10
+    thread = threading.Thread(
+        target=single_ads_table_lock, args=(lock_duration,)
+    )
+    thread.daemon = True
+    thread.start()
 
-            thread = threading.Thread(
-                target=periodic_ads_table_lock, args=(lock_duration, cooldown)
-            )
-            thread.daemon = True
-            thread.start()
-            lock_thread_started = True
-            app.logger.info("🔁 Started periodic ads table locking thread.")
-            return jsonify({
-                "message": f"Locking started (lock {lock_duration}s / cooldown {cooldown}s)"
-            }), 202
-        else:
-            return jsonify({"message": "Locking already in progress."}), 200
+    app.logger.info(f"🔁 Started one-time lock thread for {lock_duration}s.")
+    return jsonify({
+        "message": f"Locking started for {lock_duration} seconds"
+    }), 202
+
 
 def main():
     signal.signal(signal.SIGTERM, signal_handler)
