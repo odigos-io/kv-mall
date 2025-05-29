@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kv-mall
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: analytics
+  namespace: kv-mall
   labels:
     app: analytics
 spec:
@@ -14,33 +20,34 @@ spec:
         app: analytics
     spec:
       containers:
-      - name: analytics
-        image: registry.odigos.io/kv-mall-analytics:v0.6
-        env:
-        - name: KAFKA_ADDRESS
-          value: kafka-service.kv-mall-infra:9092
-        - name: MEMCACHED_ADDR
-          value: memcached.kv-mall-infra:11211
-        - name: CASSANDRA_ADDR
-          value: cassandra.kv-mall-infra:9042
-        - name: POSTGRESQL_ADDR
-          value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
-        startupProbe:
-          httpGet:
-            path: /health
-            port: 8081
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          failureThreshold: 100
-        ports:
-          - name: http
-            containerPort: 8081
-            protocol: TCP
+        - name: analytics
+          image: registry.odigos.io/kv-mall-analytics:v0.6
+          env:
+            - name: KAFKA_ADDRESS
+              value: kafka-service.kv-mall-infra:9092
+            - name: MEMCACHED_ADDR
+              value: memcached.kv-mall-infra:11211
+            - name: CASSANDRA_ADDR
+              value: cassandra.kv-mall-infra:9042
+            - name: POSTGRESQL_ADDR
+              value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 100
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: coupon
+  namespace: kv-mall
   labels:
     app: coupon
 spec:
@@ -53,20 +60,21 @@ spec:
         app: coupon
     spec:
       containers:
-      - name: coupon
-        image: registry.odigos.io/kv-mall-coupon:v0.4
-        env:
-        - name: MEMBERSHIP_SERVICE_URL
-          value: "membership:8080"
-        - name: KAFKA_ADDRESS
-          value: "kafka-service.kv-mall-infra:9092"
-        ports:
-        - containerPort: 8080
+        - name: coupon
+          image: registry.odigos.io/kv-mall-coupon:v0.4
+          env:
+            - name: MEMBERSHIP_SERVICE_URL
+              value: 'membership:8080'
+            - name: KAFKA_ADDRESS
+              value: 'kafka-service.kv-mall-infra:9092'
+          ports:
+            - containerPort: 8080
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: coupon
+  namespace: kv-mall
 spec:
   selector:
     app: coupon
@@ -79,6 +87,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mail
+  namespace: kv-mall
   labels:
     app: mail
 spec:
@@ -91,16 +100,17 @@ spec:
         app: mail
     spec:
       containers:
-      - name: mail
-        image: registry.odigos.io/kv-mall-mail:v0.3
-        env:
-        - name: KAFKA_ADDRESS
-          value: "kafka-service.kv-mall-infra:9092"
+        - name: mail
+          image: registry.odigos.io/kv-mall-mail:v0.3
+          env:
+            - name: KAFKA_ADDRESS
+              value: 'kafka-service.kv-mall-infra:9092'
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  namespace: kv-mall
   labels:
     app: frontend
 spec:
@@ -113,24 +123,28 @@ spec:
         app: frontend
     spec:
       containers:
-      - name: frontend
-        image: registry.odigos.io/kv-mall-frontend:v0.3
-        env:
-        - name: INVENTORY_SERVICE_HOST
-          value: inventory:8080
-        - name: PRICING_SERVICE_HOST
-          value: pricing:8080
-        - name: COUPON_SERVICE_HOST
-          value: coupon:8080
-        - name: ADS_SERVICE_HOST
-          value: ads:8080
-        ports:
-        - containerPort: 8080
+        - name: frontend
+          # !! need to bump tag to include currency change from ILS to EUR
+          image: registry.odigos.io/kv-mall-frontend:v0.4
+          env:
+            - name: INVENTORY_SERVICE_HOST
+              value: inventory:8080
+            - name: PRICING_SERVICE_HOST
+              value: pricing:8080
+            - name: COUPON_SERVICE_HOST
+              value: coupon:8080
+            - name: ADS_SERVICE_HOST
+              value: ads:8080
+            - name: CURRENCY_SERVICE_HOST
+              value: currency:8080
+          ports:
+            - containerPort: 8080
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: frontend
+  namespace: kv-mall
 spec:
   selector:
     app: frontend
@@ -143,6 +157,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: inventory
+  namespace: kv-mall
   labels:
     app: inventory
 spec:
@@ -167,6 +182,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: inventory
+  namespace: kv-mall
 spec:
   selector:
     app: inventory
@@ -179,6 +195,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: load-generator
+  namespace: kv-mall
   labels:
     app: load-generator
 spec:
@@ -191,18 +208,19 @@ spec:
         app: load-generator
     spec:
       containers:
-      - name: load-generator
-        image: registry.odigos.io/kv-mall-load-generator:v0.3
-        env:
-        - name: BUY_PRODUCT_INTERVAL
-          value: "2s"
-        - name: GET_PRODUCTS_INTERVAL
-          value: "10s"
+        - name: load-generator
+          image: registry.odigos.io/kv-mall-load-generator:v0.3
+          env:
+            - name: BUY_PRODUCT_INTERVAL
+              value: '2s'
+            - name: GET_PRODUCTS_INTERVAL
+              value: '10s'
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: load-generator
+  namespace: kv-mall
 spec:
   selector:
     app: load-generator
@@ -215,6 +233,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: membership
+  namespace: kv-mall
   labels:
     app: membership
 spec:
@@ -227,18 +246,19 @@ spec:
         app: membership
     spec:
       containers:
-      - name: membership
-        image: registry.odigos.io/kv-mall-membership:v0.4
-        env:
-        - name: KAFKA_ADDRESS
-          value: kafka-service.kv-mall-infra:9092
-        ports:
-        - containerPort: 8080
+        - name: membership
+          image: registry.odigos.io/kv-mall-membership:v0.4
+          env:
+            - name: KAFKA_ADDRESS
+              value: kafka-service.kv-mall-infra:9092
+          ports:
+            - containerPort: 8080
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: membership
+  namespace: kv-mall
 spec:
   selector:
     app: membership
@@ -251,6 +271,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pricing
+  namespace: kv-mall
   labels:
     app: pricing
 spec:
@@ -263,15 +284,16 @@ spec:
         app: pricing
     spec:
       containers:
-      - name: pricing
-        image: registry.odigos.io/kv-mall-pricing:v0.3
-        ports:
-        - containerPort: 8080
+        - name: pricing
+          image: registry.odigos.io/kv-mall-pricing:v0.3
+          ports:
+            - containerPort: 8080
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: pricing
+  namespace: kv-mall
 spec:
   selector:
     app: pricing
@@ -284,6 +306,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: warehouse
+  namespace: kv-mall
   labels:
     app: warehouse
 spec:
@@ -296,15 +319,16 @@ spec:
         app: warehouse
     spec:
       containers:
-      - name: warehouse
-        image: registry.odigos.io/kv-mall-warehouse:v0.3
-        ports:
-        - containerPort: 8080
+        - name: warehouse
+          image: registry.odigos.io/kv-mall-warehouse:v0.3
+          ports:
+            - containerPort: 8080
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: warehouse
+  namespace: kv-mall
 spec:
   selector:
     app: warehouse
@@ -313,16 +337,120 @@ spec:
       port: 8080
       targetPort: 8080
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ads
+  namespace: kv-mall
+  labels:
+    app: ads
+spec:
+  selector:
+    matchLabels:
+      app: ads
+  template:
+    metadata:
+      labels:
+        app: ads
+    spec:
+      containers:
+        - name: ads
+          image: registry.odigos.io/kv-mall-ads:v0.3
+          ports:
+            - containerPort: 8080
+          env:
+            - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
+              value: sqlalchemy,pymysql
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ads
+  namespace: kv-mall
+spec:
+  selector:
+    app: ads
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: currency
+  namespace: kv-mall
+  labels:
+    app: currency
+spec:
+  selector:
+    matchLabels:
+      app: currency
+  template:
+    metadata:
+      labels:
+        app: currency
+    spec:
+      containers:
+        - name: currency
+          # !! note the image is taken from simple-demo
+          #    it's OK to change to kv-mall after a new tag has been pushed (v0.1.1)
+          #    originally: registry.odigos.io/kv-mall-currency:v0.1
+          image: registry.odigos.io/odigos-demo-currency:v0.1.18
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: currency-nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: currency-nginx-config
+  namespace: kv-mall
+data:
+  nginx.conf: |
+    server {
+        listen 8080;
+        server_name localhost;
 
+        location / {
+            include fastcgi_params;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME /app/index.php;
+        }
+    }
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: currency
+  namespace: kv-mall
+spec:
+  selector:
+    app: currency
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+##################################################
 # Infrastructure
-
+##################################################
 apiVersion: v1
 kind: Namespace
 metadata:
   name: kv-mall-infra
 ---
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -339,13 +467,13 @@ spec:
         app: cassandra
     spec:
       containers:
-      - name: cassandra
-        image: cassandra:4.0
-        ports:
-        - containerPort: 9042
-        env:
-        - name: CASSANDRA_CLUSTER_NAME
-          value: "kvmall"
+        - name: cassandra
+          image: cassandra:4.0
+          ports:
+            - containerPort: 9042
+          env:
+            - name: CASSANDRA_CLUSTER_NAME
+              value: 'kvmall'
 ---
 apiVersion: v1
 kind: Service
@@ -353,15 +481,14 @@ metadata:
   name: cassandra
   namespace: kv-mall-infra
 spec:
-    selector:
-        app: cassandra
-    ports:
+  selector:
+    app: cassandra
+  ports:
     - protocol: TCP
       port: 9042
       targetPort: 9042
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -386,7 +513,7 @@ spec:
         kompose.version: 1.28.0 (HEAD)
       creationTimestamp: null
       labels:
-        io.kompose.network/tmp-default: "true"
+        io.kompose.network/tmp-default: 'true'
         io.kompose.service: kafka
     spec:
       containers:
@@ -394,7 +521,7 @@ spec:
             - name: KAFKA_CFG_PROCESS_ROLES
               value: controller,broker
             - name: KAFKA_CFG_NODE_ID
-              value: "0"
+              value: '0'
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
               value: PLAINTEXT://kafka-service.kv-mall-infra:9092
             - name: KAFKA_CFG_LISTENERS
@@ -406,8 +533,8 @@ spec:
             - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
               value: CONTROLLER
             - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
-              value: "true"
-          image: bitnami/kafka:latest
+              value: 'true'
+          image: bitnami/kafka:3.9
           name: kafka
           ports:
             - containerPort: 9092
@@ -417,7 +544,6 @@ spec:
 status: {}
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -431,17 +557,16 @@ metadata:
   namespace: kv-mall-infra
 spec:
   ports:
-    - name: "9092"
+    - name: '9092'
       port: 9092
       targetPort: 9092
-    - name: "9093"
+    - name: '9093'
       port: 9093
       targetPort: 9093
   selector:
     io.kompose.service: kafka
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -458,10 +583,10 @@ spec:
         app: memcached
     spec:
       containers:
-      - name: memcached
-        image: memcached:1.6.22-alpine
-        ports:
-        - containerPort: 11211
+        - name: memcached
+          image: memcached:1.6.22-alpine
+          ports:
+            - containerPort: 11211
 ---
 apiVersion: v1
 kind: Service
@@ -472,11 +597,10 @@ spec:
   selector:
     app: memcached
   ports:
-  - port: 11211
-    targetPort: 11211
+    - port: 11211
+      targetPort: 11211
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -485,26 +609,26 @@ metadata:
   labels:
     app: postgres
 spec:
-    selector:
-      matchLabels:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
         app: postgres
-    template:
-      metadata:
-        labels:
-          app: postgres
-      spec:
-        containers:
+    spec:
+      containers:
         - name: postgres
           image: postgres:latest
           env:
-          - name: POSTGRES_USER
-            value: postgres
-          - name: POSTGRES_PASSWORD
-            value: postgres
-          - name: POSTGRES_DB
-            value: postgres
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+            - name: POSTGRES_DB
+              value: postgres
           ports:
-          - containerPort: 5432
+            - containerPort: 5432
 ---
 apiVersion: v1
 kind: Service
@@ -512,9 +636,9 @@ metadata:
   name: postgres
   namespace: kv-mall-infra
 spec:
-    selector:
-        app: postgres
-    ports:
+  selector:
+    app: postgres
+  ports:
     - protocol: TCP
       port: 5432
       targetPort: 5432
@@ -592,41 +716,3 @@ spec:
       targetPort: 3306
   selector:
     app: mysql
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ads
-  labels:
-    app: ads
-spec:
-  selector:
-    matchLabels:
-      app: ads
-  template:
-    metadata:
-      labels:
-        app: ads
-    spec:
-      containers:
-        - name: ads
-          image: registry.odigos.io/kv-mall-ads:v0.3
-          ports:
-            - containerPort: 8080
-          securityContext:
-            runAsUser: 1000
-          env:
-          - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
-            value: sqlalchemy,pymysql
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: ads
-spec:
-  selector:
-    app: ads
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080

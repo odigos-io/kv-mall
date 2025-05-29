@@ -22,7 +22,7 @@ spec:
         kompose.version: 1.28.0 (HEAD)
       creationTimestamp: null
       labels:
-        io.kompose.network/tmp-default: "true"
+        io.kompose.network/tmp-default: 'true'
         io.kompose.service: kafka
     spec:
       containers:
@@ -30,7 +30,7 @@ spec:
             - name: KAFKA_CFG_PROCESS_ROLES
               value: controller,broker
             - name: KAFKA_CFG_NODE_ID
-              value: "0"
+              value: '0'
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
               value: PLAINTEXT://kafka-service.kv-mall-infra:9092
             - name: KAFKA_CFG_LISTENERS
@@ -42,8 +42,8 @@ spec:
             - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
               value: CONTROLLER
             - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
-              value: "true"
-          image: bitnami/kafka:latest
+              value: 'true'
+          image: bitnami/kafka:3.9
           name: kafka
           ports:
             - containerPort: 9092

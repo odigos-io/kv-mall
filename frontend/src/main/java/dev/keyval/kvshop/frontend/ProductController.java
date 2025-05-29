@@ -13,14 +13,21 @@ public class ProductController {
 
     private final InventoryService inventoryService;
     private final PricingService pricingService;
+    private final CurrencyService currencyService;
     private final CouponService couponService;
     private final AdsService adsService;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     @Autowired
-    public ProductController(InventoryService inventoryService, PricingService pricingService, CouponService couponService, AdsService adsService) {
+    public ProductController(
+            InventoryService inventoryService,
+            PricingService pricingService,
+            CurrencyService currencyService,
+            CouponService couponService,
+            AdsService adsService) {
         this.inventoryService = inventoryService;
         this.pricingService = pricingService;
+        this.currencyService = currencyService;
         this.couponService = couponService;
         this.adsService = adsService;
     }
@@ -81,12 +88,14 @@ public class ProductController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/buy")
-    public void buyProduct(@RequestParam(name ="id") int id) {
-        double price = pricObservable(id)
-                .subscribeOn(Schedulers.io())
-                .blockingFirst();
+    public void buyProduct(@RequestParam(name = "id") int id) {
+        // Validate price via pricing service
+        double price = pricObservable(id).subscribeOn(Schedulers.io()).blockingFirst();
+        int conversionRate = currencyService.getConversionRate("usd-eur");
 
-        System.out.println("Buying product with id " + id + " for $" + price);
+        String usdPrice = ("$" + price + " USD");
+        String eurPrice = ("ִ€" + (price * conversionRate) + " EUR");
+        System.out.println("Buying product with id " + id + " for " + usdPrice + " (converted to ִִִ" + eurPrice + ")");
 
         // Call inventory service to buy product
         this.inventoryService.buy(id);
