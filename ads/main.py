@@ -45,31 +45,6 @@ def ads():
     app.logger.info('ads request received!')
     return jsonify(getads())
 
-# def periodic_ads_table_lock(lock_duration: int, cooldown: int):
-#     try:
-#         conn = pymysql.connect(
-#             host="mysql.kv-mall-infra",
-#             user="adsuser",
-#             password="adspass",
-#             database="adsdb",
-#             autocommit=False
-#         )
-#         cursor = conn.cursor()
-#         while True:
-#             try:
-#                 app.logger.info(f"Locking 'ads' table for {lock_duration}s")
-#                 cursor.execute("LOCK TABLES ads WRITE")
-#                 cursor.execute("SHOW OPEN TABLES WHERE In_use > 0")
-
-#                 time.sleep(lock_duration)
-#                 cursor.execute("UNLOCK TABLES")
-#                 app.logger.info("Lock released")
-#                 time.sleep(cooldown)
-#             except Exception as e:
-#                 app.logger.error(f"Lock cycle error: {e}")
-#                 time.sleep(5)
-#     except Exception as e:
-#         app.logger.error(f"Failed to establish locking connection: {e}")
 
 def single_ads_table_lock(lock_duration: int):
     try:
