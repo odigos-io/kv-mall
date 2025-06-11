@@ -18,4 +18,8 @@ spec:
         image: dev/inventory:dev
         ports:
         - containerPort: 8080
+        env:  
+          - name: ADS_SERVICE_HOST
+            value: ads:8080
+
   

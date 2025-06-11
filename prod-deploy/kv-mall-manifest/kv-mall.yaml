@@ -170,10 +170,13 @@ spec:
         app: inventory
     spec:
       containers:
-        - name: inventory
-          image: registry.odigos.io/kv-mall-inventory:v0.3
-          ports:
-            - containerPort: 8080
+      - name: inventory
+        image: registry.odigos.io/kv-mall-inventory:v0.3
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ADS_SERVICE_HOST
+          value: ads:8080
 ---
 kind: Service
 apiVersion: v1

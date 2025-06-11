@@ -21,6 +21,7 @@ build-images: generate-webapp
 	docker build -t dev/ads:dev $(PROJECT_DIR)ads -f $(PROJECT_DIR)ads/Dockerfile
 	docker build -t dev/warehouse:dev $(PROJECT_DIR)warehouse -f $(PROJECT_DIR)warehouse/Dockerfile
 	docker build -t dev/load-generator:dev $(PROJECT_DIR)load-generator -f $(PROJECT_DIR)load-generator/Dockerfile
+	docker build -t dev/currency:dev $(PROJECT_DIR)currency -f $(PROJECT_DIR)currency/Dockerfile
 
 .PHONY: load-to-kind
 load-to-kind:
@@ -35,6 +36,7 @@ load-to-kind:
 	kind load docker-image dev/ads:dev
 	kind load docker-image dev/warehouse:dev
 	kind load docker-image dev/load-generator:dev
+	kind load docker-image dev/currency:dev
 
 .PHONY: deploy
 deploy:
@@ -49,6 +51,7 @@ deploy:
 	kubectl apply -f $(PROJECT_DIR)ads/deployment/
 	kubectl apply -f $(PROJECT_DIR)warehouse/deployment/
 	kubectl apply -f $(PROJECT_DIR)load-generator/deployment/
+	kubectl apply -f $(PROJECT_DIR)currency/deployment/
 
 .PHONY: deploy-infra
 deploy-infra:
