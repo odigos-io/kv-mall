@@ -6,22 +6,19 @@ import os
 import sys
 import time
 import pymysql
+import urllib.parse  # For escaping credentials
 
-from sqlalchemy import create_engine, event
-from google.cloud.sqlcommenter.sqlalchemy.executor import BeforeExecuteFactory
 
-# try:
-#     from opentelemetry.trace.propagation.tracecontext import (
-#         TraceContextTextMapPropagator,
-#     )
-#     propagator = TraceContextTextMapPropagator()
-# except ImportError:
-#     propagator = None
 
 app = Flask(__name__)
 engine = None
 lock_thread_started = False
 lock_thread_lock = threading.Lock()
+
+db_user = os.environ.get("DB_USER", "root")
+db_pass = urllib.parse.quote_plus(os.environ.get("DB_PASS", ""))
+db_host = os.environ.get("DB_HOST", "localhost")
+db_name = os.environ.get("DB_NAME", "")
 
 def signal_handler(sig, frame):
     print('Terminating inventory service')
@@ -49,10 +46,10 @@ def ads():
 def single_ads_table_lock(lock_duration: int):
     try:
         conn = pymysql.connect(
-            host="mysql.kv-mall-infra",
-            user="adsuser",
-            password="adspass",
-            database="adsdb",
+            db_host,
+            db_user,
+            db_pass,
+            db_name,
             autocommit=False
         )
         cursor = conn.cursor()
@@ -91,7 +88,8 @@ def main():
     global engine
     PORT = int(os.getenv('PORT', '8080'))
 
-    engine = create_engine("mysql+pymysql://adsuser:adspass@mysql.kv-mall-infra:3306/adsdb")
+    db_url = f"mysql+pymysql://{db_user}:{db_pass}@{db_host}:3306/{db_name}"
+    engine = create_engine(db_url)
     app.logger.info("Not using OpenTelemetry")
     listener = BeforeExecuteFactory()
   
