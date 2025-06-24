@@ -19,8 +19,9 @@ const (
 	DefaultGetProductsInterval = 10 * time.Second
 	GetProductsIntervalEnv     = "GET_PRODUCTS_INTERVAL"
 
-	MaxProductID = 20
-	MinProductID = 1
+	MaxProductID   = 20
+	MinProductID   = 1
+	watchProductID = 12
 )
 
 type LoadGenerator struct {
@@ -98,7 +99,9 @@ func (lg *LoadGenerator) run(ctx context.Context) {
 		case <-tickerBuyProduct.C:
 			go lg.buyProduct(ctx, lg.lastProductID)
 			lg.lastProductID++
-			if lg.lastProductID == 12 {
+			// since buy operation on the watch product
+			// will trigger table lock, we want to skip it for the load-generator
+			if lg.lastProductID == watchProductID {
 				lg.lastProductID++
 			}
 			if lg.lastProductID > MaxProductID {
