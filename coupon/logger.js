@@ -1,5 +1,4 @@
 const pino = require('pino');
-const { trace, context } = require('@opentelemetry/api');
 
 // Create pino logger with custom serializers and formatters
 const logger = pino({
@@ -7,17 +6,6 @@ const logger = pino({
   formatters: {
     level: (label) => {
       return { level: label };
-    },
-    log: (object) => {
-      // Add OpenTelemetry trace context to every log
-      const span = trace.getActiveSpan();
-      if (span) {
-        const spanContext = span.spanContext();
-        object.traceId = spanContext.traceId;
-        object.spanId = spanContext.spanId;
-        object.traceFlags = spanContext.traceFlags;
-      }
-      return object;
     }
   },
   serializers: {
@@ -32,7 +20,7 @@ const getChildLogger = (context = {}) => {
   return logger.child(context);
 };
 
-// Helper function to log HTTP requests with trace correlation
+// Helper function to log HTTP requests
 const logHttpRequest = (method, url, statusCode, responseTime, additionalData = {}) => {
   logger.info({
     httpRequest: {

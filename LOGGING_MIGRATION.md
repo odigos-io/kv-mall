@@ -1,8 +1,8 @@
-# Logging Migration: Console.log to Pino with OpenTelemetry Correlation
+# Logging Migration: Console.log to Pino with Runtime Agent Correlation
 
 ## Overview
 
-This document describes the migration of NodeJS applications from `console.log` to structured logging using **Pino** with **OpenTelemetry trace correlation**. The goal is to enable correlation between automatic instrumentation traces and application logs for better observability.
+This document describes the migration of NodeJS applications from `console.log` to structured logging using **Pino**. The correlation between logs and distributed traces will be handled automatically by a **runtime observability agent** (such as OpenTelemetry auto-instrumentation), so no observability-specific code is needed in the application.
 
 ## Changes Made
 
@@ -11,11 +11,9 @@ This document describes the migration of NodeJS applications from `console.log` 
 #### Coupon Service (`coupon/package.json`)
 - `pino`: ^8.15.0 - Fast JSON logger for Node.js
 - `pino-http`: ^8.5.0 - HTTP request logging middleware
-- `@opentelemetry/api`: ^1.6.0 - OpenTelemetry API for trace correlation
 
 #### Mail Service (`mail/package.json`)
 - `pino`: ^8.15.0 - Fast JSON logger for Node.js
-- `@opentelemetry/api`: ^1.6.0 - OpenTelemetry API for trace correlation
 
 #### Webapp Frontend (`webapp/`)
 - Custom browser-compatible logger utility created (`utils/logger.js`)
@@ -24,7 +22,6 @@ This document describes the migration of NodeJS applications from `console.log` 
 ### 2. Logger Utilities Created
 
 #### Coupon Service (`coupon/logger.js`)
-- **Trace Correlation**: Automatically adds `traceId`, `spanId`, and `traceFlags` to all log entries
 - **Structured Logging**: JSON format with proper serializers for requests, responses, and errors
 - **Helper Functions**:
   - `logHttpRequest()`: Log HTTP requests with timing and status codes
@@ -32,8 +29,7 @@ This document describes the migration of NodeJS applications from `console.log` 
   - `logKafkaOperation()`: Log Kafka producer operations
 
 #### Mail Service (`mail/logger.ts`)
-- **Trace Correlation**: Automatically adds OpenTelemetry trace context to all log entries
-- **TypeScript Support**: Proper type definitions
+- **TypeScript Support**: Proper type definitions for structured logging
 - **Helper Functions**:
   - `logKafkaOperation()`: Log Kafka consumer operations
   - `logMessageProcessing()`: Log message processing with timing
@@ -138,18 +134,17 @@ logger.info('Initiating product purchase', {
 
 ## Log Structure
 
-### Trace Correlation
-Every log entry now includes:
+### Standard Application Logs
+Structured JSON logs ready for correlation by runtime agent:
 ```json
 {
   "level": "info",
   "time": "2024-01-15T10:30:00.000Z",
-  "traceId": "abc123def456...",
-  "spanId": "789xyz...",
-  "traceFlags": 1,
   "msg": "Coupon request received",
   "endpoint": "/coupons",
-  "method": "GET"
+  "method": "GET",
+  "userAgent": "Mozilla/5.0...",
+  "ip": "192.168.1.1"
 }
 ```
 
@@ -158,7 +153,6 @@ Every log entry now includes:
 {
   "level": "info",
   "time": "2024-01-15T10:30:00.000Z",
-  "traceId": "abc123def456...",
   "httpRequest": {
     "method": "GET",
     "url": "/coupons",
@@ -174,7 +168,6 @@ Every log entry now includes:
 {
   "level": "info",
   "time": "2024-01-15T10:30:00.000Z",
-  "traceId": "abc123def456...",
   "externalCall": {
     "service": "membership-service",
     "method": "GET",
@@ -192,7 +185,6 @@ Every log entry now includes:
 {
   "level": "info",
   "time": "2024-01-15T10:30:00.000Z",
-  "traceId": "abc123def456...",
   "kafka": {
     "operation": "send",
     "topic": "coupon-applied",
@@ -272,26 +264,34 @@ export NEXT_PUBLIC_LOG_LEVEL=info
 ## Benefits
 
 1. **Structured Logging**: JSON format enables better parsing and searching
-2. **Trace Correlation**: Each log entry includes OpenTelemetry trace context
+2. **Runtime Correlation**: Logs will be automatically correlated with traces by observability agent
 3. **Performance Monitoring**: Automatic timing for HTTP requests and external calls
 4. **Better Debugging**: Structured error handling with proper context
-5. **Observability**: Correlation between traces and logs for end-to-end visibility
+5. **Agent-Based Observability**: No application code changes needed for trace correlation
 6. **Production Ready**: Proper log levels and graceful shutdown handling
 
 ## Observability Integration
 
 The new logging setup integrates with:
-- **OpenTelemetry**: Automatic trace correlation
+- **Runtime Agents**: OpenTelemetry auto-instrumentation or similar agents handle correlation
 - **Log Aggregation**: JSON format ready for ELK stack, Splunk, etc.
-- **APM Tools**: Trace ID correlation enables linking logs to distributed traces
+- **APM Tools**: Agent-based correlation links logs to distributed traces automatically
 - **Monitoring**: Structured data enables better alerting and dashboards
+
+## How Runtime Correlation Works
+
+1. **Observability Agent**: Deployed alongside your application (as sidecar, agent, or library)
+2. **Automatic Instrumentation**: Agent automatically instruments HTTP, database, and messaging calls
+3. **Context Propagation**: Agent handles trace context propagation across service boundaries
+4. **Log Correlation**: Agent automatically injects trace IDs into log records at runtime
+5. **No Code Changes**: Application code remains clean and focused on business logic
 
 ## Next Steps
 
 1. **Install Dependencies**: Run the installation commands for both backend services
-2. **OpenTelemetry Setup**: Ensure OpenTelemetry instrumentation is properly configured and enabled
-3. **Log Aggregation**: Configure your log aggregation system (ELK, Splunk, etc.) to collect JSON logs
-4. **Trace Correlation**: Set up dashboards to correlate traces with logs using `traceId` field
+2. **Deploy with Agent**: Deploy services with your observability agent (OpenTelemetry, Datadog, etc.)
+3. **Configure Agent**: Ensure agent is configured to inject trace context into logs
+4. **Log Aggregation**: Configure your log aggregation system to collect JSON logs
 5. **Monitoring & Alerts**: Configure alerts based on structured log data and error rates
 6. **Client-side Logging**: Consider implementing proper client-side logging infrastructure for production
 7. **Testing**: Test the correlation between traces and logs across service boundaries
@@ -300,7 +300,7 @@ The new logging setup integrates with:
 
 To verify the logging setup is working correctly:
 
-1. **Start the services** with OpenTelemetry instrumentation
+1. **Start the services** with your observability agent
 2. **Make HTTP requests** to the coupon service
-3. **Check logs** contain `traceId`, `spanId`, and proper structured data
+3. **Check logs** contain proper structured data and agent-injected trace context
 4. **Verify correlation** between logs and traces in your observability platform

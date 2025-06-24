@@ -1,5 +1,4 @@
 import pino from 'pino';
-import { trace } from '@opentelemetry/api';
 
 // Create pino logger with custom serializers and formatters
 const logger = pino({
@@ -7,17 +6,6 @@ const logger = pino({
   formatters: {
     level: (label: string) => {
       return { level: label };
-    },
-    log: (object: any) => {
-      // Add OpenTelemetry trace context to every log
-      const span = trace.getActiveSpan();
-      if (span) {
-        const spanContext = span.spanContext();
-        object.traceId = spanContext.traceId;
-        object.spanId = spanContext.spanId;
-        object.traceFlags = spanContext.traceFlags;
-      }
-      return object;
     }
   },
   serializers: {

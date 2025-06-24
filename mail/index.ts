@@ -1,6 +1,5 @@
 import { Kafka, EachMessagePayload } from "kafkajs";
 import { logger, logKafkaOperation, logMessageProcessing } from "./logger";
-import * as process from "process";
 
 const kafkaAddress = process.env["KAFKA_ADDRESS"];
 if (!kafkaAddress) {
