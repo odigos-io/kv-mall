@@ -7,7 +7,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: analytics
-  namespace: kv-mall
   labels:
     app: analytics
 spec:
@@ -20,28 +19,28 @@ spec:
         app: analytics
     spec:
       containers:
-        - name: analytics
-          image: registry.odigos.io/kv-mall-analytics:v0.6
-          env:
-            - name: KAFKA_ADDRESS
-              value: kafka-service.kv-mall-infra:9092
-            - name: MEMCACHED_ADDR
-              value: memcached.kv-mall-infra:11211
-            - name: CASSANDRA_ADDR
-              value: cassandra.kv-mall-infra:9042
-            - name: POSTGRESQL_ADDR
-              value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
-          startupProbe:
-            httpGet:
-              path: /health
-              port: 8081
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            failureThreshold: 100
-          ports:
-            - name: http
-              containerPort: 8081
-              protocol: TCP
+      - name: analytics
+        image: dev/analytics:dev
+        env:
+        - name: KAFKA_ADDRESS
+          value: kafka-service.kv-mall-infra:9092
+        - name: MEMCACHED_ADDR
+          value: memcached.kv-mall-infra:11211
+        - name: CASSANDRA_ADDR
+          value: cassandra.kv-mall-infra:9042
+        - name: POSTGRESQL_ADDR
+          value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 100
+        ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -171,12 +170,12 @@ spec:
     spec:
       containers:
       - name: inventory
-        image: registry.odigos.io/kv-mall-inventory:v0.3
+        image: dev/inventory:dev
         ports:
         - containerPort: 8080
         env:
-        - name: ADS_SERVICE_HOST
-          value: ads:8080
+          - name: ADS_SERVICE_HOST
+            value: ads:8080
 ---
 kind: Service
 apiVersion: v1
@@ -354,13 +353,21 @@ spec:
         app: ads
     spec:
       containers:
-        - name: ads
-          image: registry.odigos.io/kv-mall-ads:v0.3
-          ports:
-            - containerPort: 8080
-          env:
-            - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
-              value: sqlalchemy,pymysql
+      - name: ads
+        image: dev/ads:dev
+        ports:
+          - containerPort: 8080
+        securityContext:
+          runAsUser: 1000
+        env:
+          - name: DB_HOST
+            value: "mysql.kv-mall-infra"
+          - name: DB_USER
+            value: "adsuser"
+          - name: DB_PASS
+            value: "adspass"
+          - name: DB_NAME
+            value: "adsdb"          
 ---
 kind: Service
 apiVersion: v1
@@ -401,7 +408,7 @@ spec:
           ports:
             - containerPort: 9000
         - name: nginx
-          image: nginx:latest
+          image: nginx:1.27.5
           ports:
             - containerPort: 8080
           volumeMounts:
