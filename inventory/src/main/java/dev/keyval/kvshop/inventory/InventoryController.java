@@ -22,6 +22,7 @@ public class InventoryController {
 
     private static final List<InventoryItem> items = loadItems();
     private final KafkaProducer<String, String> producer;
+    private static final Integer WatchProductID = 12;
 
     @Autowired
     public InventoryController(InventoryKafkaProducer producer) {
@@ -37,7 +38,7 @@ public class InventoryController {
     @PostMapping("/buy")
     public void buyProduct(@RequestParam int id) throws InterruptedException {
         System.out.println("Buying product with id " + id);
-        if (id == 12) {
+        if (id == WatchProductID) {
             System.out.println("Simulating lock for product with id " + id);
             triggerLockRequest(10);  // Lock for 10s
         }
