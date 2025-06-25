@@ -7,6 +7,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: analytics
+  namespace: kv-mall
   labels:
     app: analytics
 spec:
@@ -170,7 +171,7 @@ spec:
     spec:
       containers:
       - name: inventory
-        image: registry.odigos.io/kv-mall-inventory:v0.3
+        image: registry.odigos.io/kv-mall-inventory:v0.4
         ports:
         - containerPort: 8080
         env:
@@ -208,7 +209,7 @@ spec:
     spec:
       containers:
         - name: load-generator
-          image: registry.odigos.io/kv-mall-load-generator:v0.3
+          image: registry.odigos.io/kv-mall-load-generator:v0.4
           env:
             - name: BUY_PRODUCT_INTERVAL
               value: '2s'
@@ -354,8 +355,7 @@ spec:
     spec:
       containers:
       - name: ads
-        #image: registry.odigos.io/kv-mall-ads:v0.4
-        image: dev/ads:dev
+        image: registry.odigos.io/kv-mall-ads:v0.4
         ports:
           - containerPort: 8080
         securityContext:
