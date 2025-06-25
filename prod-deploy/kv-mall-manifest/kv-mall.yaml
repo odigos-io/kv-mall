@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: analytics
-        image: image: registry.odigos.io/kv-mall-analytics:v0.6
+        image: registry.odigos.io/kv-mall-analytics:v0.6
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -354,7 +354,8 @@ spec:
     spec:
       containers:
       - name: ads
-        image: registry.odigos.io/kv-mall-ads:v0.4
+        #image: registry.odigos.io/kv-mall-ads:v0.4
+        image: dev/ads:dev
         ports:
           - containerPort: 8080
         securityContext:
@@ -400,7 +401,7 @@ spec:
     spec:
       containers:
         - name: currency
-          image: registry.odigos.io/odigos-demo-currency:v0.2
+          image: registry.odigos.io/kv-mall-currency:v0.2
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
