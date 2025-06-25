@@ -1,67 +1,65 @@
-import threading
-import sqlalchemy
-from sqlalchemy import create_engine, event
-from flask import Flask, jsonify, request
-import signal
 import os
 import sys
 import time
-import pymysql
-import urllib.parse  # For escaping credentials
+import signal
+import threading
+import urllib.parse
 
+from opentelemetry import trace
+from flask import Flask, jsonify, request
+from sqlalchemy import create_engine, event, text
+from google.cloud.sqlcommenter.sqlalchemy.executor import BeforeExecuteFactory
 
+# OpenTelemetry instrumentation
+try:
+    from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+    propagator = TraceContextTextMapPropagator()
+except ImportError:
+    propagator = None
 
 app = Flask(__name__)
 engine = None
-lock_thread_started = False
-lock_thread_lock = threading.Lock()
+tracer = trace.get_tracer(__name__)
 
+# Database configuration from env
 db_user = os.environ.get("DB_USER", "root")
 db_pass = urllib.parse.quote_plus(os.environ.get("DB_PASS", ""))
 db_host = os.environ.get("DB_HOST", "localhost")
 db_name = os.environ.get("DB_NAME", "")
+db_url = f"mysql+pymysql://{db_user}:{db_pass}@{db_host}:3306/{db_name}"
 
+# Graceful shutdown
 def signal_handler(sig, frame):
     print('Terminating inventory service')
     sys.exit(0)
 
+# /ads endpoint
 def getads():
     while True:
         try:
-            with engine.connect() as conn:
-                result = conn.execute(sqlalchemy.text('SELECT * FROM ads'))
+            with engine.begin() as conn:
+                result = conn.execute(text('SELECT * FROM ads'))
                 ads = [dict(row) for row in result.mappings().all()]
-                app.logger.info("Ads retrieved from the database: {}".format(ads))
+                app.logger.info(f"Ads retrieved from the database: {ads}")
                 return ads
         except Exception as e:
-            app.logger.error("Error retrieving ads from the database: {}, retrying again soon".format(e))
+            app.logger.error(f"Error retrieving ads from the database: {e}, retrying again soon")
             time.sleep(1)
-            continue
 
 @app.route('/ads', methods=['GET'])
 def ads():
-    app.logger.info('ads request received!')
+    app.logger.info('/ads request received!')
     return jsonify(getads())
-
 
 def single_ads_table_lock(lock_duration: int):
     try:
-        conn = pymysql.connect(
-            host=db_host,
-            user=db_user,
-            password=urllib.parse.unquote_plus(db_pass),
-            database=db_name,
-            autocommit=False
-        )
-        
-        cursor = conn.cursor()
-        app.logger.info(f"Locking 'ads' table for {lock_duration}s")
-        cursor.execute("LOCK TABLES ads WRITE")
-        time.sleep(lock_duration)
-        cursor.execute("UNLOCK TABLES")
-        app.logger.info("Lock released")
-        cursor.close()
-        conn.close()
+        with engine.connect() as conn:
+            app.logger.info(f"Locking 'ads' table for {lock_duration}s")
+            conn.execute(text("LOCK TABLES ads WRITE"))
+            time.sleep(lock_duration)
+            with tracer.start_as_current_span("UNLOCK TABLES"):
+                conn.execute(text("UNLOCK TABLES"))
+            app.logger.info("Lock released")
     except Exception as e:
         app.logger.error(f"Error while locking ads table: {e}")
 
@@ -84,17 +82,22 @@ def start_single_lock():
         "message": f"Asynchronous lock started for {lock_duration} seconds"
     }), 202
 
-
+# App entry point
 def main():
-    signal.signal(signal.SIGTERM, signal_handler)
     global engine
+    signal.signal(signal.SIGTERM, signal_handler)
     PORT = int(os.getenv('PORT', '8080'))
 
-    db_url = f"mysql+pymysql://{db_user}:{db_pass}@{db_host}:3306/{db_name}"
     engine = create_engine(db_url)
-    app.logger.info("Not using OpenTelemetry")
 
-    # Removed the undefined event listener
+    if propagator is not None:
+        app.logger.info("Using OpenTelemetry auto-instrumentation")
+        listener = BeforeExecuteFactory(with_opentelemetry=True)
+    else:
+        app.logger.info("Running without OpenTelemetry")
+        listener = BeforeExecuteFactory()
+
+    event.listen(engine, 'before_cursor_execute', listener, retval=True)
     app.run(host='0.0.0.0', port=PORT, debug=False)
 
 if __name__ == '__main__':
