@@ -1,4 +1,5 @@
 import threading
+import sqlalchemy
 from sqlalchemy import create_engine, event
 from flask import Flask, jsonify, request
 import signal
@@ -46,12 +47,13 @@ def ads():
 def single_ads_table_lock(lock_duration: int):
     try:
         conn = pymysql.connect(
-            db_host,
-            db_user,
-            db_pass,
-            db_name,
+            host=db_host,
+            user=db_user,
+            password=urllib.parse.unquote_plus(db_pass),
+            database=db_name,
             autocommit=False
         )
+        
         cursor = conn.cursor()
         app.logger.info(f"Locking 'ads' table for {lock_duration}s")
         cursor.execute("LOCK TABLES ads WRITE")
