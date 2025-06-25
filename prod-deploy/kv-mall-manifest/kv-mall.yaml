@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: analytics
-        image: dev/analytics:dev
+        image: image: registry.odigos.io/kv-mall-analytics:v0.6
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -124,7 +124,7 @@ spec:
       containers:
         - name: frontend
           # !! need to bump tag to include currency change from ILS to EUR
-          image: registry.odigos.io/kv-mall-frontend:v0.4
+          image: registry.odigos.io/kv-mall-frontend:v0.5
           env:
             - name: INVENTORY_SERVICE_HOST
               value: inventory:8080
@@ -170,7 +170,7 @@ spec:
     spec:
       containers:
       - name: inventory
-        image: dev/inventory:dev
+        image: registry.odigos.io/kv-mall-inventory:v0.3
         ports:
         - containerPort: 8080
         env:
@@ -354,7 +354,7 @@ spec:
     spec:
       containers:
       - name: ads
-        image: dev/ads:dev
+        image: registry.odigos.io/kv-mall-ads:v0.4
         ports:
           - containerPort: 8080
         securityContext:
@@ -400,10 +400,7 @@ spec:
     spec:
       containers:
         - name: currency
-          # !! note the image is taken from simple-demo
-          #    it's OK to change to kv-mall after a new tag has been pushed (v0.1.1)
-          #    originally: registry.odigos.io/kv-mall-currency:v0.1
-          image: registry.odigos.io/odigos-demo-currency:v0.1.18
+          image: registry.odigos.io/odigos-demo-currency:v0.2
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
