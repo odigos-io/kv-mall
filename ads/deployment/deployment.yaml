@@ -29,5 +29,3 @@ spec:
             value: "adspass"
           - name: DB_NAME
             value: "adsdb"
-
-          
