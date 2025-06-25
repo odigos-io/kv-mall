@@ -19,8 +19,8 @@ public class AdsService {
                       RestTemplateBuilder restTemplateBuilder) {
         this.adsServiceHost = adsServiceHost;
         this.restTemplate = restTemplateBuilder
-                .setConnectTimeout(Duration.ofSeconds(3))
-                .setReadTimeout(Duration.ofSeconds(5))
+                .setConnectTimeout(Duration.ofSeconds(1))
+                .setReadTimeout(Duration.ofSeconds(2))
                 .build();
     }
 
