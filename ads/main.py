@@ -1,5 +1,5 @@
 import threading
-import sqlalchemy
+from sqlalchemy import create_engine, event
 from flask import Flask, jsonify, request
 import signal
 import os
@@ -91,11 +91,9 @@ def main():
     db_url = f"mysql+pymysql://{db_user}:{db_pass}@{db_host}:3306/{db_name}"
     engine = create_engine(db_url)
     app.logger.info("Not using OpenTelemetry")
-    listener = BeforeExecuteFactory()
-  
-    event.listen(engine, 'before_cursor_execute', listener, retval=True)
-    app.run(host='0.0.0.0', port=PORT, debug=False)
 
+    # Removed the undefined event listener
+    app.run(host='0.0.0.0', port=PORT, debug=False)
 
 if __name__ == '__main__':
     main()
