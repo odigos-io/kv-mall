@@ -1,7 +1,22 @@
+# Core app dependencies
 Flask==2.0.1
 Werkzeug==2.0.1
-google-cloud-sqlcommenter==2.0.0
 sqlalchemy==2.0.28
 pymysql==1.1.0
 cryptography==42.0.5
 protobuf==4.25.3
+
+# Google SQLCommenter (for trace injection)
+google-cloud-sqlcommenter==2.0.0
+
+# OpenTelemetry core API + SDK
+opentelemetry-api==1.25.0
+opentelemetry-sdk==1.25.0
+
+# OTLP Exporter (if you're sending traces to a collector like Tempo/Jaeger/Google Cloud)
+opentelemetry-exporter-otlp==1.25.0
+
+# Instrumentation support
+opentelemetry-instrumentation==0.46b0
+opentelemetry-instrumentation-sqlalchemy==0.46b0
+opentelemetry-instrumentation-flask==0.46b0
