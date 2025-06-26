@@ -20,28 +20,28 @@ spec:
         app: analytics
     spec:
       containers:
-        - name: analytics
-          image: registry.odigos.io/kv-mall-analytics:v0.6
-          env:
-            - name: KAFKA_ADDRESS
-              value: kafka-service.kv-mall-infra:9092
-            - name: MEMCACHED_ADDR
-              value: memcached.kv-mall-infra:11211
-            - name: CASSANDRA_ADDR
-              value: cassandra.kv-mall-infra:9042
-            - name: POSTGRESQL_ADDR
-              value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
-          startupProbe:
-            httpGet:
-              path: /health
-              port: 8081
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            failureThreshold: 100
-          ports:
-            - name: http
-              containerPort: 8081
-              protocol: TCP
+      - name: analytics
+        image: registry.odigos.io/kv-mall-analytics:v0.6
+        env:
+        - name: KAFKA_ADDRESS
+          value: kafka-service.kv-mall-infra:9092
+        - name: MEMCACHED_ADDR
+          value: memcached.kv-mall-infra:11211
+        - name: CASSANDRA_ADDR
+          value: cassandra.kv-mall-infra:9042
+        - name: POSTGRESQL_ADDR
+          value: postgresql://postgres:postgres@postgres.kv-mall-infra:5432/postgres?sslmode=disable
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 100
+        ports:
+          - name: http
+            containerPort: 8081
+            protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -125,7 +125,7 @@ spec:
       containers:
         - name: frontend
           # !! need to bump tag to include currency change from ILS to EUR
-          image: registry.odigos.io/kv-mall-frontend:v0.4
+          image: registry.odigos.io/kv-mall-frontend:v0.5
           env:
             - name: INVENTORY_SERVICE_HOST
               value: inventory:8080
@@ -170,10 +170,13 @@ spec:
         app: inventory
     spec:
       containers:
-        - name: inventory
-          image: registry.odigos.io/kv-mall-inventory:v0.3
-          ports:
-            - containerPort: 8080
+      - name: inventory
+        image: registry.odigos.io/kv-mall-inventory:v0.4
+        ports:
+        - containerPort: 8080
+        env:
+          - name: ADS_SERVICE_HOST
+            value: ads:8080
 ---
 kind: Service
 apiVersion: v1
@@ -206,7 +209,7 @@ spec:
     spec:
       containers:
         - name: load-generator
-          image: registry.odigos.io/kv-mall-load-generator:v0.3
+          image: registry.odigos.io/kv-mall-load-generator:v0.4
           env:
             - name: BUY_PRODUCT_INTERVAL
               value: '2s'
@@ -351,13 +354,21 @@ spec:
         app: ads
     spec:
       containers:
-        - name: ads
-          image: registry.odigos.io/kv-mall-ads:v0.3
-          ports:
-            - containerPort: 8080
-          env:
-            - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
-              value: sqlalchemy,pymysql
+      - name: ads
+        image: registry.odigos.io/kv-mall-ads:v0.4
+        ports:
+          - containerPort: 8080
+        securityContext:
+          runAsUser: 1000
+        env:
+          - name: DB_HOST
+            value: "mysql.kv-mall-infra"
+          - name: DB_USER
+            value: "adsuser"
+          - name: DB_PASS
+            value: "adspass"
+          - name: DB_NAME
+            value: "adsdb"          
 ---
 kind: Service
 apiVersion: v1
@@ -390,15 +401,12 @@ spec:
     spec:
       containers:
         - name: currency
-          # !! note the image is taken from simple-demo
-          #    it's OK to change to kv-mall after a new tag has been pushed (v0.1.1)
-          #    originally: registry.odigos.io/kv-mall-currency:v0.1
-          image: registry.odigos.io/odigos-demo-currency:v0.1.18
+          image: registry.odigos.io/kv-mall-currency:v0.2
           imagePullPolicy: Always
           ports:
             - containerPort: 9000
         - name: nginx
-          image: nginx:latest
+          image: nginx:1.27.5
           ports:
             - containerPort: 8080
           volumeMounts:

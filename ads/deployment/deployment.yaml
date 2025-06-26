@@ -14,12 +14,18 @@ spec:
         app: ads
     spec:
       containers:
-        - name: ads
-          image: dev/ads:dev
-          ports:
-            - containerPort: 8080
-          securityContext:
-            runAsUser: 1000
-          env:
-          - name: OTEL_PYTHON_DISABLED_INSTRUMENTATIONS
-            value: sqlalchemy,pymysql
+      - name: ads
+        image: dev/ads:dev
+        ports:
+          - containerPort: 8080
+        securityContext:
+          runAsUser: 1000
+        env:
+          - name: DB_HOST
+            value: "mysql.kv-mall-infra"
+          - name: DB_USER
+            value: "adsuser"
+          - name: DB_PASS
+            value: "adspass"
+          - name: DB_NAME
+            value: "adsdb"
