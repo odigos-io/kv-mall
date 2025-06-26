@@ -28,12 +28,10 @@ db_host = os.environ.get("DB_HOST", "localhost")
 db_name = os.environ.get("DB_NAME", "")
 db_url = f"mysql+pymysql://{db_user}:{db_pass}@{db_host}:3306/{db_name}"
 
-# Graceful shutdown
 def signal_handler(sig, frame):
     print('Terminating inventory service')
     sys.exit(0)
 
-# /ads endpoint
 def getads():
     while True:
         try:
@@ -53,10 +51,11 @@ def ads():
 
 def single_ads_table_lock(lock_duration: int):
     try:
-        with engine.connect() as conn:
+        with engine.begin() as conn:  # starts a transaction block
             app.logger.info(f"Locking 'ads' table for {lock_duration}s")
             conn.execute(text("LOCK TABLES ads WRITE"))
             time.sleep(lock_duration)
+            conn.execute(text("UNLOCK TABLES"))
             app.logger.info("Lock released")
     except Exception as e:
         app.logger.error(f"Error while locking ads table: {e}")
@@ -80,7 +79,6 @@ def start_single_lock():
         "message": f"Asynchronous lock started for {lock_duration} seconds"
     }), 202
 
-# App entry point
 def main():
     global engine
     signal.signal(signal.SIGTERM, signal_handler)
