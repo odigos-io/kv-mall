@@ -5,21 +5,21 @@ import signal
 import threading
 import urllib.parse
 
-from opentelemetry import trace
 from flask import Flask, jsonify, request
 from sqlalchemy import create_engine, event, text
 from google.cloud.sqlcommenter.sqlalchemy.executor import BeforeExecuteFactory
 
-# OpenTelemetry instrumentation
 try:
-    from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+    from opentelemetry.trace.propagation.tracecontext import (
+        TraceContextTextMapPropagator,
+    )
+
     propagator = TraceContextTextMapPropagator()
 except ImportError:
     propagator = None
 
 app = Flask(__name__)
 engine = None
-tracer = trace.get_tracer(__name__)
 
 # Database configuration from env
 db_user = os.environ.get("DB_USER", "root")
@@ -57,8 +57,6 @@ def single_ads_table_lock(lock_duration: int):
             app.logger.info(f"Locking 'ads' table for {lock_duration}s")
             conn.execute(text("LOCK TABLES ads WRITE"))
             time.sleep(lock_duration)
-            with tracer.start_as_current_span("UNLOCK TABLES"):
-                conn.execute(text("UNLOCK TABLES"))
             app.logger.info("Lock released")
     except Exception as e:
         app.logger.error(f"Error while locking ads table: {e}")
