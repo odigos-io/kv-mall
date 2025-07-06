@@ -1,4 +1,5 @@
 import React from 'react';
+import { logger, logApiCall } from '../utils/logger';
 
 const ProductCard = ({ product }) => {
   const [green, setGreen] = React.useState(false);
@@ -10,19 +11,59 @@ const ProductCard = ({ product }) => {
       <button
         className={`${green ? 'bg-green-500' : 'bg-blue-500'} hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mt-2`}
         onClick={() => {
-          fetch(`/buy?id=${product.id}`, {
+          const startTime = Date.now();
+          const url = `/buy?id=${product.id}`;
+          
+          logger.info('Initiating product purchase', {
+            productId: product.id,
+            productName: product.name,
+            productPrice: product.price
+          });
+          
+          fetch(url, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
           })
-            .then(data => {
-              setGreen(true);
-              setTimeout(() => {
-                setGreen(false);
-              }, 500);
+            .then(response => {
+              const responseTime = Date.now() - startTime;
+              logApiCall('POST', url, response.status, responseTime, response.ok);
+              
+              if (response.ok) {
+                logger.info('Product purchase successful', {
+                  productId: product.id,
+                  responseTime
+                });
+                setGreen(true);
+                setTimeout(() => {
+                  setGreen(false);
+                }, 500);
+              } else {
+                logger.warn('Product purchase response not ok', {
+                  productId: product.id,
+                  status: response.status,
+                  responseTime
+                });
+              }
+              return response;
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+              const responseTime = Date.now() - startTime;
+              logApiCall('POST', url, 0, responseTime, false, {
+                name: err.name,
+                message: err.message
+              });
+              
+              logger.error('Product purchase failed', {
+                productId: product.id,
+                error: {
+                  name: err.name,
+                  message: err.message
+                },
+                responseTime
+              });
+            });
         }
         }
       >
