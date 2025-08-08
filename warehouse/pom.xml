@@ -30,6 +30,13 @@
       <artifactId>slf4j-simple</artifactId>
       <version>1.7.32</version>
     </dependency>
+
+    <!-- OpenTelemetry API for manual instrumentation -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+      <version>1.52.0</version>
+    </dependency>
   </dependencies>
 
   <build>

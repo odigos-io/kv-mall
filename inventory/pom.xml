@@ -32,6 +32,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- OpenTelemetry API for manual instrumentation -->
+		<dependency>
+			<groupId>io.opentelemetry</groupId>
+			<artifactId>opentelemetry-api</artifactId>
+			<version>1.52.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
