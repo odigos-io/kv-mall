@@ -125,7 +125,7 @@ spec:
       containers:
         - name: frontend
           # !! need to bump tag to include currency change from ILS to EUR
-          image: registry.odigos.io/kv-mall-frontend:v0.5
+          image: registry.odigos.io/kv-mall-frontend:v0.4-otel
           env:
             - name: INVENTORY_SERVICE_HOST
               value: inventory:8080
@@ -171,7 +171,7 @@ spec:
     spec:
       containers:
       - name: inventory
-        image: registry.odigos.io/kv-mall-inventory:v0.4
+        image: registry.odigos.io/kv-mall-inventory:v0.4-otel
         ports:
         - containerPort: 8080
         env:
@@ -285,7 +285,7 @@ spec:
     spec:
       containers:
         - name: pricing
-          image: registry.odigos.io/kv-mall-pricing:v0.3
+          image: registry.odigos.io/kv-mall-pricing:v0.3-otel
           ports:
             - containerPort: 8080
 ---
