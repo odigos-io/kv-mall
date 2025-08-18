@@ -35,9 +35,12 @@ The following databases and message brokers are used:
 ## Running the `kv-mall`
 ### Using k8 manifest
 > Assuming you have a k8 cluster running localy:
-```sh
-kubectl apply -f https://raw.githubusercontent.com/odigos-io/kv-mall/main/prod-deploy/kv-mall-manifest/kv-mall.yaml
-```
+1. 
+    ```sh
+    kubectl apply -f https://raw.githubusercontent.com/odigos-io/kv-mall/main/prod-deploy/kv-mall-manifest/kv-mall.yaml
+    ```
+2. port-forward the service: `kubectl port-forward -nkv-mall service/frontend 8080:8080`
+
 
 ### Manual
 #### Infrastructure (only) deployment
