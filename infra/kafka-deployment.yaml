@@ -43,7 +43,7 @@ spec:
               value: CONTROLLER
             - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
               value: 'true'
-          image: bitnami/kafka:3.9
+          image: bitnamilegacy/kafka:3.9
           name: kafka
           ports:
             - containerPort: 9092
