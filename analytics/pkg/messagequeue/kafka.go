@@ -3,8 +3,10 @@ package messagequeue
 import (
 	"context"
 	"fmt"
-	"github.com/segmentio/kafka-go"
 	"os"
+	"time"
+
+	"github.com/segmentio/kafka-go"
 )
 
 type MessageQueue interface {
@@ -28,12 +30,37 @@ func (k *KafkaMessageQueue) getKafkaAddress() string {
 }
 
 func (k *KafkaMessageQueue) Connect() error {
+	if k.reader != nil {
+		k.reader.Close()
+	}
+
 	k.reader = kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{k.getKafkaAddress()},
 		Topic:    "analytics",
 		GroupID:  "analytics",
 		MaxBytes: 10e6, // 10MB
 	})
+
+	// Actually verify the connection by trying to fetch metadata
+	// This ensures Kafka is ready and the topic exists
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, err := kafka.DialContext(ctx, "tcp", k.getKafkaAddress())
+	if err != nil {
+		return fmt.Errorf("failed to dial kafka: %w", err)
+	}
+	defer conn.Close()
+
+	// Verify the topic exists
+	partitions, err := conn.ReadPartitions("analytics")
+	if err != nil {
+		return fmt.Errorf("failed to read partitions: %w", err)
+	}
+
+	if len(partitions) == 0 {
+		return fmt.Errorf("topic 'analytics' has no partitions")
+	}
 
 	return nil
 }
