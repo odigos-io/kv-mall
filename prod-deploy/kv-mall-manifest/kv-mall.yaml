@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: analytics
-        image: registry.odigos.io/kv-mall-analytics:v0.6
+        image: registry.odigos.io/kv-mall-analytics:v0.7
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
