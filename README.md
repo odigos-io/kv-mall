@@ -4,7 +4,7 @@ This is an example of a complex microservice architecture.
 
 ![KV Mall](kv_mall.png)
 
-## Architecture
+## Services Architecture
 
 KV Mall contains the following services:
 
@@ -31,7 +31,19 @@ The following databases and message brokers are used:
 - Azure CosmosDB
 - PostgreSQL
 
-## Deploying infrastructure
+
+## Running the `kv-mall`
+### Using k8 manifest
+> Assuming you have a k8 cluster running localy:
+1. 
+    ```sh
+    kubectl apply -f https://raw.githubusercontent.com/odigos-io/kv-mall/main/prod-deploy/kv-mall-manifest/kv-mall.yaml
+    ```
+2. port-forward the service: `kubectl port-forward -nkv-mall service/frontend 8080:8080`
+
+
+### Manual
+#### Infrastructure (only) deployment
 
 Before running the kv mall application, you need to deploy the infrastructure. To do so, run the following command:
 
@@ -41,16 +53,10 @@ make deploy-infra
 
 **Make sure all the infrastructure is running before running the application.**
 
-## Running locally
+#### Complete deployment
 
 To build the project and run it locally on a Kind cluster, run the following command:
 
 ```bash
 make build-images load-to-kind deploy
-```
-
-## Deploying kv-mall in k8s
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/odigos-io/kv-mall/main/prod-deploy/kv-mall-manifest/kv-mall.yaml
 ```
