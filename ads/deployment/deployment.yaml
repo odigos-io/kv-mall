@@ -16,6 +16,18 @@ spec:
       containers:
       - name: ads
         image: dev/ads:dev
+        resources:
+          requests:
+            cpu: 50m
+            memory: 96Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
         ports:
           - containerPort: 8080
         securityContext:

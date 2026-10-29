@@ -63,10 +63,21 @@ spec:
             - name: KAFKA_ZOOKEEPER_CONNECT
               value: zookeeper:2181
           image: wurstmeister/kafka:2.12-2.3.1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1536Mi
+            limits:
+              cpu: 1
+              memory: 1536Mi
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 5
+            periodSeconds: 5
           name: kafka
           ports:
             - containerPort: 9092
             - containerPort: 9093
-          resources: {}
       restartPolicy: Always
 status: {}

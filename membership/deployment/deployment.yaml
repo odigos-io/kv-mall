@@ -16,6 +16,18 @@ spec:
       containers:
       - name: membership
         image: dev/membership:dev
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            cpu: 250m
+            memory: 128Mi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
         env:
           - name: KAFKA_ADDRESS
             value: kafka-service.kv-mall-infra:9092

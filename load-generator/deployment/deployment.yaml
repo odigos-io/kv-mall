@@ -13,9 +13,28 @@ spec:
       labels:
         app: load-generator
     spec:
+      initContainers:
+        - name: wait-for-frontend
+          image: busybox:1.36.1
+          # start load only once the frontend and the services behind /products answer
+          command: ['sh', '-c', 'until wget -q -T 5 -O /dev/null http://frontend:8080/products; do sleep 2; done']
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 32Mi
       containers:
       - name: load-generator
         image: dev/load-generator:dev
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            cpu: 2
+            memory: 512Mi
         env:
         - name: BUY_PRODUCT_INTERVAL
           value: "2s"

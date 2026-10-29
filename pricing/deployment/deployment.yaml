@@ -16,6 +16,18 @@ spec:
       containers:
       - name: pricing
         image: dev/pricing:dev
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1
+            memory: 1Gi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
         ports:
         - containerPort: 8080
   
