@@ -23,6 +23,11 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
         env:
           - name: MEMBERSHIP_SERVICE_URL
             value: "membership:8080"

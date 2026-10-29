@@ -70,6 +70,11 @@ spec:
             limits:
               cpu: 1
               memory: 1536Mi
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 5
+            periodSeconds: 5
           name: kafka
           ports:
             - containerPort: 9092

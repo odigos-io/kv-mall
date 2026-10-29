@@ -23,6 +23,11 @@ spec:
             limits:
               cpu: 1
               memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
           env:
             - name: INVENTORY_SERVICE_HOST
               value: inventory:8080

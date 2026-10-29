@@ -29,6 +29,11 @@ spec:
           limits:
             cpu: 250m
             memory: 128Mi
+        readinessProbe:
+          tcpSocket:
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -76,6 +81,11 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
           env:
             - name: MEMBERSHIP_SERVICE_URL
               value: 'membership:8080'
@@ -154,6 +164,11 @@ spec:
             limits:
               cpu: 1
               memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
           env:
             - name: INVENTORY_SERVICE_HOST
               value: inventory:8080
@@ -207,6 +222,11 @@ spec:
           limits:
             cpu: 1
             memory: 1Gi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
         ports:
         - containerPort: 8080
         env:
@@ -242,6 +262,18 @@ spec:
       labels:
         app: load-generator
     spec:
+      initContainers:
+        - name: wait-for-frontend
+          image: busybox:1.36.1
+          # start load only once the frontend and the services behind /products answer
+          command: ['sh', '-c', 'until wget -q -T 5 -O /dev/null http://frontend:8080/products; do sleep 2; done']
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 32Mi
       containers:
         - name: load-generator
           image: registry.odigos.io/kv-mall-load-generator:v0.4
@@ -297,6 +329,11 @@ spec:
             limits:
               cpu: 250m
               memory: 128Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
           env:
             - name: KAFKA_ADDRESS
               value: kafka-service.kv-mall-infra:9092
@@ -342,6 +379,11 @@ spec:
             limits:
               cpu: 1
               memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
           ports:
             - containerPort: 8080
 ---
@@ -426,6 +468,11 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
         ports:
           - containerPort: 8080
         securityContext:
@@ -480,6 +527,11 @@ spec:
             limits:
               cpu: 250m
               memory: 128Mi
+          readinessProbe:
+            tcpSocket:
+              port: 9000
+            initialDelaySeconds: 5
+            periodSeconds: 5
           ports:
             - containerPort: 9000
         - name: nginx
@@ -491,6 +543,11 @@ spec:
             limits:
               cpu: 100m
               memory: 64Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
           ports:
             - containerPort: 8080
           volumeMounts:
@@ -565,6 +622,11 @@ spec:
             limits:
               cpu: 2
               memory: 2Gi
+          readinessProbe:
+            tcpSocket:
+              port: 9042
+            initialDelaySeconds: 5
+            periodSeconds: 5
           ports:
             - containerPort: 9042
           env:
@@ -642,6 +704,11 @@ spec:
             limits:
               cpu: 1
               memory: 1536Mi
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 5
+            periodSeconds: 5
           name: kafka
           ports:
             - containerPort: 9092
@@ -698,6 +765,11 @@ spec:
             limits:
               cpu: 100m
               memory: 96Mi
+          readinessProbe:
+            tcpSocket:
+              port: 11211
+            initialDelaySeconds: 5
+            periodSeconds: 5
           ports:
             - containerPort: 11211
 ---
@@ -740,6 +812,11 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 5
+            periodSeconds: 5
           env:
             - name: POSTGRES_USER
               value: postgres
@@ -788,6 +865,11 @@ spec:
             limits:
               cpu: 1
               memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 5
+            periodSeconds: 5
           name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
