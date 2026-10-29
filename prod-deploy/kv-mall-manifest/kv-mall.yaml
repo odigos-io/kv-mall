@@ -22,6 +22,13 @@ spec:
       containers:
       - name: analytics
         image: registry.odigos.io/kv-mall-analytics:v0.7
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            cpu: 250m
+            memory: 128Mi
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -62,6 +69,13 @@ spec:
       containers:
         - name: coupon
           image: registry.odigos.io/kv-mall-coupon:v0.4
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           env:
             - name: MEMBERSHIP_SERVICE_URL
               value: 'membership:8080'
@@ -102,6 +116,13 @@ spec:
       containers:
         - name: mail
           image: registry.odigos.io/kv-mall-mail:v0.3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           env:
             - name: KAFKA_ADDRESS
               value: 'kafka-service.kv-mall-infra:9092'
@@ -126,6 +147,13 @@ spec:
         - name: frontend
           # !! need to bump tag to include currency change from ILS to EUR
           image: registry.odigos.io/kv-mall-frontend:v0.5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 384Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
           env:
             - name: INVENTORY_SERVICE_HOST
               value: inventory:8080
@@ -172,6 +200,13 @@ spec:
       containers:
       - name: inventory
         image: registry.odigos.io/kv-mall-inventory:v0.4
+        resources:
+          requests:
+            cpu: 100m
+            memory: 384Mi
+          limits:
+            cpu: 1
+            memory: 1Gi
         ports:
         - containerPort: 8080
         env:
@@ -210,6 +245,13 @@ spec:
       containers:
         - name: load-generator
           image: registry.odigos.io/kv-mall-load-generator:v0.4
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
           env:
             - name: BUY_PRODUCT_INTERVAL
               value: '2s'
@@ -248,6 +290,13 @@ spec:
       containers:
         - name: membership
           image: registry.odigos.io/kv-mall-membership:v0.4
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
           env:
             - name: KAFKA_ADDRESS
               value: kafka-service.kv-mall-infra:9092
@@ -286,6 +335,13 @@ spec:
       containers:
         - name: pricing
           image: registry.odigos.io/kv-mall-pricing:v0.3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
           ports:
             - containerPort: 8080
 ---
@@ -321,6 +377,13 @@ spec:
       containers:
         - name: warehouse
           image: registry.odigos.io/kv-mall-warehouse:v0.3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
           ports:
             - containerPort: 8080
 ---
@@ -356,6 +419,13 @@ spec:
       containers:
       - name: ads
         image: registry.odigos.io/kv-mall-ads:v0.4
+        resources:
+          requests:
+            cpu: 50m
+            memory: 96Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
         ports:
           - containerPort: 8080
         securityContext:
@@ -403,10 +473,24 @@ spec:
         - name: currency
           image: registry.odigos.io/kv-mall-currency:v0.2
           imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
           ports:
             - containerPort: 9000
         - name: nginx
           image: nginx:1.27.5
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
           ports:
             - containerPort: 8080
           volumeMounts:
@@ -474,11 +558,22 @@ spec:
       containers:
         - name: cassandra
           image: cassandra:4.0
+          resources:
+            requests:
+              cpu: 250m
+              memory: 2Gi
+            limits:
+              cpu: 2
+              memory: 2Gi
           ports:
             - containerPort: 9042
           env:
             - name: CASSANDRA_CLUSTER_NAME
               value: 'kvmall'
+            - name: MAX_HEAP_SIZE
+              value: '1G'
+            - name: HEAP_NEWSIZE
+              value: '256M'
 ---
 apiVersion: v1
 kind: Service
@@ -540,11 +635,17 @@ spec:
             - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
               value: 'true'
           image: bitnamilegacy/kafka:3.9
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1536Mi
+            limits:
+              cpu: 1
+              memory: 1536Mi
           name: kafka
           ports:
             - containerPort: 9092
             - containerPort: 9093
-          resources: {}
       restartPolicy: Always
 status: {}
 
@@ -590,6 +691,13 @@ spec:
       containers:
         - name: memcached
           image: memcached:1.6.22-alpine
+          resources:
+            requests:
+              cpu: 10m
+              memory: 96Mi
+            limits:
+              cpu: 100m
+              memory: 96Mi
           ports:
             - containerPort: 11211
 ---
@@ -625,6 +733,13 @@ spec:
       containers:
         - name: postgres
           image: postgres:latest
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           env:
             - name: POSTGRES_USER
               value: postgres
@@ -666,6 +781,13 @@ spec:
     spec:
       containers:
         - image: mysql
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: 1
+              memory: 1Gi
           name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD

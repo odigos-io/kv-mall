@@ -44,10 +44,16 @@ spec:
             - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
               value: 'true'
           image: bitnamilegacy/kafka:3.9
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1536Mi
+            limits:
+              cpu: 1
+              memory: 1536Mi
           name: kafka
           ports:
             - containerPort: 9092
             - containerPort: 9093
-          resources: {}
       restartPolicy: Always
 status: {}

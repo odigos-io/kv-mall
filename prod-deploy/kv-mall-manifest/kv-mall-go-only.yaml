@@ -22,6 +22,13 @@ spec:
       containers:
       - name: analytics
         image: registry.odigos.io/kv-mall-analytics:v0.7
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            cpu: 250m
+            memory: 128Mi
         env:
         - name: KAFKA_ADDRESS
           value: kafka-service.kv-mall-infra:9092
@@ -62,6 +69,13 @@ spec:
       containers:
         - name: load-generator
           image: registry.odigos.io/kv-mall-load-generator:v0.4
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
           env:
             - name: BUY_PRODUCT_INTERVAL
               value: '2s'
@@ -100,6 +114,13 @@ spec:
       containers:
         - name: membership
           image: registry.odigos.io/kv-mall-membership:v0.4
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
           env:
             - name: KAFKA_ADDRESS
               value: kafka-service.kv-mall-infra:9092
@@ -145,11 +166,22 @@ spec:
       containers:
         - name: cassandra
           image: cassandra:4.0
+          resources:
+            requests:
+              cpu: 250m
+              memory: 2Gi
+            limits:
+              cpu: 2
+              memory: 2Gi
           ports:
             - containerPort: 9042
           env:
             - name: CASSANDRA_CLUSTER_NAME
               value: 'kvmall'
+            - name: MAX_HEAP_SIZE
+              value: '1G'
+            - name: HEAP_NEWSIZE
+              value: '256M'
 ---
 apiVersion: v1
 kind: Service
@@ -191,6 +223,13 @@ spec:
       containers:
         - name: kafka
           image: bitnamilegacy/kafka:3.9
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1536Mi
+            limits:
+              cpu: 1
+              memory: 1536Mi
           env:
             - name: KAFKA_CFG_PROCESS_ROLES
               value: controller,broker
@@ -252,6 +291,13 @@ spec:
       containers:
         - name: memcached
           image: memcached:1.6.22-alpine
+          resources:
+            requests:
+              cpu: 10m
+              memory: 96Mi
+            limits:
+              cpu: 100m
+              memory: 96Mi
           ports:
             - containerPort: 11211
 ---
@@ -286,6 +332,13 @@ spec:
       containers:
         - name: postgres
           image: postgres:latest
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           env:
             - name: POSTGRES_USER
               value: postgres

@@ -16,6 +16,13 @@ spec:
       containers:
       - name: load-generator
         image: dev/load-generator:dev
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            cpu: 250m
+            memory: 128Mi
         env:
         - name: BUY_PRODUCT_INTERVAL
           value: "2s"

@@ -16,6 +16,13 @@ spec:
       containers:
       - name: warehouse
         image: dev/warehouse:dev
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 1
+            memory: 1Gi
         ports:
         - containerPort: 8080
   

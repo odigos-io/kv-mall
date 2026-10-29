@@ -16,11 +16,22 @@ spec:
       containers:
       - name: cassandra
         image: cassandra:4.0
+        resources:
+          requests:
+            cpu: 250m
+            memory: 2Gi
+          limits:
+            cpu: 2
+            memory: 2Gi
         ports:
         - containerPort: 9042
         env:
         - name: CASSANDRA_CLUSTER_NAME
           value: "kvmall"
+        - name: MAX_HEAP_SIZE
+          value: "1G"
+        - name: HEAP_NEWSIZE
+          value: "256M"
 ---
 apiVersion: v1
 kind: Service

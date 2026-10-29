@@ -16,6 +16,13 @@ spec:
       containers:
       - name: coupon
         image: dev/coupon:dev
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
         env:
           - name: MEMBERSHIP_SERVICE_URL
             value: "membership:8080"

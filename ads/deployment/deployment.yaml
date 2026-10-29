@@ -16,6 +16,13 @@ spec:
       containers:
       - name: ads
         image: dev/ads:dev
+        resources:
+          requests:
+            cpu: 50m
+            memory: 96Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
         ports:
           - containerPort: 8080
         securityContext:

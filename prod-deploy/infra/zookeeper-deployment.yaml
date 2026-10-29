@@ -28,9 +28,15 @@ spec:
       serviceAccountName: kv-mall-infra
       containers:
         - image: wurstmeister/zookeeper
+          resources:
+            requests:
+              cpu: 50m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           name: zookeeper
           ports:
             - containerPort: 2181
-          resources: {}
       restartPolicy: Always
 status: {}

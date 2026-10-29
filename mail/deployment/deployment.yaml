@@ -16,6 +16,13 @@ spec:
       containers:
       - name: mail
         image: dev/mail:dev
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
         env:
         - name: KAFKA_ADDRESS
           value: "kafka-service.kv-mall-infra:9092"
